@@ -1,0 +1,357 @@
+<!DOCTYPE html>
+<html lang="pt-br">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Resultado do Cálculo</title>
+    <style>
+        :root {
+            --primary: #667eea;
+            --primary-dark: #5a6fd8;
+            --secondary: #764ba2;
+            --accent: #f093fb;
+            --background: #f8fafc;
+            --surface: #ffffff;
+            --text-primary: #1a202c;
+            --text-secondary: #718096;
+            --border: #e2e8f0;
+            --shadow: 0 10px 25px rgba(0,0,0,0.05);
+            --shadow-lg: 0 20px 40px rgba(0,0,0,0.1);
+            --radius: 16px;
+            --transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+            background: linear-gradient(135deg, var(--background) 0%, #e8f2ff 100%);
+            color: var(--text-primary);
+            line-height: 1.6;
+            min-height: 100vh;
+            padding: 2rem;
+        }
+
+        .container {
+            max-width: 1000px;
+            margin: 0 auto;
+            background: var(--surface);
+            border-radius: var(--radius);
+            box-shadow: var(--shadow-lg);
+            overflow: hidden;
+        }
+
+        .header {
+            background: linear-gradient(135deg, var(--primary) 0%, var(--secondary) 100%);
+            color: white;
+            padding: 2rem;
+            text-align: center;
+        }
+
+        .header h1 {
+            font-size: 2.5rem;
+            font-weight: 800;
+            margin-bottom: 0.5rem;
+        }
+
+        .header p {
+            font-size: 1.1rem;
+            opacity: 0.9;
+        }
+
+        .content {
+            padding: 2rem;
+        }
+
+        .result-summary {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 1.5rem;
+            margin-bottom: 2rem;
+        }
+
+        .summary-card {
+            background: linear-gradient(135deg, var(--surface) 0%, #f8fafc 100%);
+            border: 1px solid var(--border);
+            border-radius: 12px;
+            padding: 1.5rem;
+            text-align: center;
+            transition: var(--transition);
+        }
+
+        .summary-card:hover {
+            transform: translateY(-3px);
+            box-shadow: var(--shadow);
+        }
+
+        .summary-value {
+            font-size: 2rem;
+            font-weight: 800;
+            color: var(--primary);
+            margin-bottom: 0.5rem;
+        }
+
+        .summary-label {
+            color: var(--text-secondary);
+            font-weight: 600;
+            text-transform: uppercase;
+            font-size: 0.85rem;
+            letter-spacing: 0.5px;
+        }
+
+        .details-section {
+            background: var(--surface);
+            border: 1px solid var(--border);
+            border-radius: 12px;
+            padding: 2rem;
+            margin-bottom: 2rem;
+        }
+
+        .details-section h2 {
+            font-size: 1.5rem;
+            font-weight: 700;
+            margin-bottom: 1.5rem;
+            color: var(--text-primary);
+            border-bottom: 2px solid var(--border);
+            padding-bottom: 0.5rem;
+        }
+
+        .professional-item {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 1rem;
+            margin-bottom: 0.5rem;
+            background: #f8fafc;
+            border-radius: 8px;
+            border-left: 4px solid var(--primary);
+        }
+
+        .professional-info {
+            flex: 1;
+        }
+
+        .professional-name {
+            font-weight: 600;
+            color: var(--text-primary);
+            margin-bottom: 0.25rem;
+        }
+
+        .professional-details {
+            font-size: 0.9rem;
+            color: var(--text-secondary);
+        }
+
+        .professional-cost {
+            font-weight: 700;
+            font-size: 1.1rem;
+            color: var(--primary);
+        }
+
+        .actions {
+            display: flex;
+            gap: 1rem;
+            justify-content: center;
+            margin-top: 2rem;
+        }
+
+        .btn {
+            padding: 0.75rem 1.5rem;
+            border-radius: 8px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: var(--transition);
+            text-decoration: none;
+            display: inline-block;
+            font-size: 0.95rem;
+            border: none;
+        }
+
+        .btn-primary {
+            background: linear-gradient(135deg, var(--primary) 0%, var(--primary-dark) 100%);
+            color: white;
+        }
+
+        .btn-secondary {
+            background: var(--surface);
+            color: var(--text-primary);
+            border: 1px solid var(--border);
+        }
+
+        .btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 8px 20px rgba(102, 126, 234, 0.2);
+        }
+
+        .export-section {
+            background: linear-gradient(135deg, #f8fafc 0%, var(--surface) 100%);
+            border: 1px solid var(--border);
+            border-radius: 12px;
+            padding: 1.5rem;
+            text-align: center;
+            margin-bottom: 2rem;
+        }
+
+        .export-section h3 {
+            margin-bottom: 1rem;
+            color: var(--text-primary);
+        }
+
+        .export-buttons {
+            display: flex;
+            gap: 1rem;
+            justify-content: center;
+            flex-wrap: wrap;
+        }
+
+        @media (max-width: 768px) {
+            .container {
+                margin: 1rem;
+            }
+
+            .header {
+                padding: 1.5rem 1rem;
+            }
+
+            .header h1 {
+                font-size: 2rem;
+            }
+
+            .content {
+                padding: 1.5rem 1rem;
+            }
+
+            .professional-item {
+                flex-direction: column;
+                text-align: center;
+                gap: 0.5rem;
+            }
+
+            .actions {
+                flex-direction: column;
+            }
+
+            .export-buttons {
+                flex-direction: column;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <h1>✅ Cálculo Concluído</h1>
+            <p>Resultado da análise de rentabilidade do projeto</p>
+        </div>
+
+        <div class="content">
+            <div class="result-summary">
+                <div class="summary-card">
+                    <div class="summary-value" id="custoTotal">R$ 0,00</div>
+                    <div class="summary-label">Custo Total</div>
+                </div>
+                <div class="summary-card">
+                    <div class="summary-value" id="markup">0%</div>
+                    <div class="summary-label">Markup Aplicado</div>
+                </div>
+                <div class="summary-card">
+                    <div class="summary-value" id="valorFinal">R$ 0,00</div>
+                    <div class="summary-label">Valor Final</div>
+                </div>
+                <div class="summary-card">
+                    <div class="summary-value" id="margem">R$ 0,00</div>
+                    <div class="summary-label">Margem de Lucro</div>
+                </div>
+            </div>
+
+            <div class="details-section">
+                <h2>📋 Detalhamento por Profissional</h2>
+                <div id="professionalsList">
+                    <!-- Será preenchido via JavaScript com os dados do formulário -->
+                </div>
+            </div>
+
+            <div class="export-section">
+                <h3>📊 Exportar Resultado</h3>
+                <div class="export-buttons">
+                    <button class="btn btn-secondary" onclick="exportToPDF()">📄 Exportar PDF</button>
+                    <button class="btn btn-secondary" onclick="exportToExcel()">📊 Exportar Excel</button>
+                </div>
+            </div>
+
+            <div class="actions">
+                <a href="/" class="btn btn-secondary">🏠 Voltar ao Início</a>
+                <a href="/" class="btn btn-primary">🔄 Novo Cálculo</a>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // Processar dados do formulário (isso viria do backend)
+        document.addEventListener('DOMContentLoaded', function() {
+            // Simulação de dados - no projeto real, estes dados viriam do Flask
+            processFormData();
+        });
+
+        function processFormData() {
+            // Aqui você processaria os dados reais vindos do formulário
+            // Por enquanto, vou simular alguns valores
+            const custoTotal = 15000;
+            const markupPercent = 25;
+            const valorFinal = custoTotal * (1 + markupPercent/100);
+            const margem = valorFinal - custoTotal;
+
+            // Atualizar cards de resumo
+            document.getElementById('custoTotal').textContent =
+                `R$ ${custoTotal.toLocaleString('pt-BR', {minimumFractionDigits: 2})}`;
+            document.getElementById('markup').textContent = `${markupPercent}%`;
+            document.getElementById('valorFinal').textContent =
+                `R$ ${valorFinal.toLocaleString('pt-BR', {minimumFractionDigits: 2})}`;
+            document.getElementById('margem').textContent =
+                `R$ ${margem.toLocaleString('pt-BR', {minimumFractionDigits: 2})}`;
+
+            // Simular lista de profissionais
+            const profissionais = [
+                { nome: 'João Silva', nivel: 'Senior', horas: 160, valorHora: 75, total: 12000 },
+                { nome: 'Maria Santos', nivel: 'Pleno', horas: 80, valorHora: 50, total: 4000 }
+            ];
+
+            renderProfessionalsList(profissionais);
+        }
+
+        function renderProfessionalsList(profissionais) {
+            const container = document.getElementById('professionalsList');
+            container.innerHTML = '';
+
+            profissionais.forEach(prof => {
+                const item = document.createElement('div');
+                item.className = 'professional-item';
+                item.innerHTML = `
+                    <div class="professional-info">
+                        <div class="professional-name">${prof.nome}</div>
+                        <div class="professional-details">
+                            ${prof.nivel} • ${prof.horas}h • R$ ${prof.valorHora}/h
+                        </div>
+                    </div>
+                    <div class="professional-cost">
+                        R$ ${prof.total.toLocaleString('pt-BR', {minimumFractionDigits: 2})}
+                    </div>
+                `;
+                container.appendChild(item);
+            });
+        }
+
+        function exportToPDF() {
+            alert('Funcionalidade de exportar PDF será implementada em breve!');
+        }
+
+        function exportToExcel() {
+            alert('Funcionalidade de exportar Excel será implementada em breve!');
+        }
+    </script>
+</body>
+</html>

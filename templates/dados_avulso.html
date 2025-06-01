@@ -1,0 +1,432 @@
+<!DOCTYPE html>
+<html lang="pt-br">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Dados do Projeto Avulso</title>
+    <style>
+        :root {
+            --primary: #667eea;
+            --primary-dark: #5a6fd8;
+            --secondary: #764ba2;
+            --accent: #f093fb;
+            --background: #f8fafc;
+            --surface: #ffffff;
+            --text-primary: #1a202c;
+            --text-secondary: #718096;
+            --border: #e2e8f0;
+            --shadow: 0 10px 25px rgba(0,0,0,0.05);
+            --shadow-lg: 0 20px 40px rgba(0,0,0,0.1);
+            --radius: 16px;
+            --transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+            background: linear-gradient(135deg, var(--background) 0%, #e8f2ff 100%);
+            color: var(--text-primary);
+            line-height: 1.6;
+            min-height: 100vh;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            padding: 2rem;
+        }
+
+        .back-button {
+            position: absolute;
+            top: 2rem;
+            left: 2rem;
+            background: var(--surface);
+            border: 1px solid var(--border);
+            border-radius: 50%;
+            width: 50px;
+            height: 50px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: var(--text-secondary);
+            text-decoration: none;
+            transition: var(--transition);
+            box-shadow: var(--shadow);
+        }
+
+        .back-button:hover {
+            background: var(--primary);
+            color: white;
+            transform: translateY(-2px);
+        }
+
+        .container {
+            background: var(--surface);
+            padding: 3rem;
+            border-radius: var(--radius);
+            box-shadow: var(--shadow-lg);
+            width: 100%;
+            max-width: 550px;
+            backdrop-filter: blur(10px);
+            border: 1px solid var(--border);
+        }
+
+        .header {
+            text-align: center;
+            margin-bottom: 2rem;
+        }
+
+        .header .icon {
+            width: 70px;
+            height: 70px;
+            background: linear-gradient(135deg, var(--primary) 0%, var(--accent) 100%);
+            border-radius: 20px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin: 0 auto 1rem;
+            font-size: 2rem;
+        }
+
+        h1 {
+            font-size: 2rem;
+            font-weight: 800;
+            color: var(--text-primary);
+            margin-bottom: 0.5rem;
+        }
+
+        .subtitle {
+            color: var(--text-secondary);
+            font-size: 1rem;
+        }
+
+        .form-group {
+            margin-bottom: 1.5rem;
+        }
+
+        label {
+            display: block;
+            font-weight: 600;
+            color: var(--text-primary);
+            margin-bottom: 0.5rem;
+            font-size: 0.95rem;
+        }
+
+        .label-description {
+            font-size: 0.85rem;
+            color: var(--text-secondary);
+            font-weight: normal;
+            margin-top: 0.25rem;
+        }
+
+        input[type="number"],
+        input[type="date"] {
+            width: 100%;
+            padding: 1rem;
+            border: 2px solid var(--border);
+            border-radius: 8px;
+            font-size: 1rem;
+            transition: var(--transition);
+            background: var(--surface);
+            color: var(--text-primary);
+        }
+
+        input[type="number"]:focus,
+        input[type="date"]:focus {
+            outline: none;
+            border-color: var(--primary);
+            box-shadow: 0 0 0 3px rgba(102, 126, 234, 0.1);
+        }
+
+        input[type="number"]:invalid,
+        input[type="date"]:invalid {
+            border-color: #ef4444;
+        }
+
+        .btn {
+            width: 100%;
+            padding: 1rem;
+            background: linear-gradient(135deg, var(--primary) 0%, var(--primary-dark) 100%);
+            color: white;
+            border: none;
+            border-radius: 8px;
+            font-size: 1rem;
+            font-weight: 600;
+            cursor: pointer;
+            transition: var(--transition);
+            margin-top: 1rem;
+        }
+
+        .btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 8px 20px rgba(102, 126, 234, 0.3);
+        }
+
+        .btn:disabled {
+            opacity: 0.5;
+            cursor: not-allowed;
+            transform: none;
+        }
+
+        .info-card {
+            background: linear-gradient(135deg, rgba(102, 126, 234, 0.05) 0%, rgba(248, 250, 252, 1) 100%);
+            border: 1px solid rgba(102, 126, 234, 0.2);
+            border-radius: 8px;
+            padding: 1rem;
+            margin-bottom: 1.5rem;
+        }
+
+        .info-card .icon {
+            display: inline-block;
+            margin-right: 0.5rem;
+        }
+
+        .info-card p {
+            color: var(--text-secondary);
+            font-size: 0.9rem;
+            margin: 0;
+        }
+
+        .duration-display {
+            background: linear-gradient(135deg, var(--accent) 0%, var(--primary) 100%);
+            color: white;
+            padding: 0.75rem 1rem;
+            border-radius: 8px;
+            font-weight: 600;
+            text-align: center;
+            margin-top: 0.5rem;
+            opacity: 0;
+            transition: var(--transition);
+        }
+
+        .duration-display.show {
+            opacity: 1;
+        }
+
+        .form-row {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 1rem;
+        }
+
+        .date-info {
+            font-size: 0.8rem;
+            color: var(--text-secondary);
+            margin-top: 0.25rem;
+        }
+
+        @media (max-width: 768px) {
+            body {
+                padding: 1rem;
+            }
+
+            .container {
+                padding: 2rem 1.5rem;
+            }
+
+            h1 {
+                font-size: 1.5rem;
+            }
+
+            .back-button {
+                position: fixed;
+            }
+
+            .form-row {
+                grid-template-columns: 1fr;
+            }
+        }
+    </style>
+</head>
+<body>
+    <a href="/" class="back-button">←</a>
+
+    <div class="container">
+        <div class="header">
+            <div class="icon">⚡</div>
+            <h1>Projeto Avulso</h1>
+            <p class="subtitle">Configure os dados do seu projeto pontual</p>
+        </div>
+
+        <div class="info-card">
+            <span class="icon">💡</span>
+            <p>Projetos avulsos são ideais para trabalhos pontuais com prazo determinado e escopo fechado.</p>
+        </div>
+
+        <form method="POST" id="projectForm">
+            <div class="form-row">
+                <div class="form-group">
+                    <label for="data_contrato">
+                        Data do Contrato
+                        <div class="label-description">Quando o contrato foi assinado</div>
+                    </label>
+                    <input type="date" name="data_contrato" id="data_contrato" required onchange="calculateDuration()">
+                    <div class="date-info" id="contratoInfo"></div>
+                </div>
+
+                <div class="form-group">
+                    <label for="prazo">
+                        Prazo de Entrega
+                        <div class="label-description">Data limite para conclusão</div>
+                    </label>
+                    <input type="date" name="prazo" id="prazo" required onchange="calculateDuration()">
+                    <div class="date-info" id="prazoInfo"></div>
+                </div>
+            </div>
+
+            <div class="duration-display" id="durationDisplay">
+                <span id="durationText">Selecione as datas para ver a duração</span>
+            </div>
+
+            <div class="form-group">
+                <label for="horas_contratadas">
+                    Total de Horas Contratadas
+                    <div class="label-description">Quantidade total de horas para o projeto</div>
+                </label>
+                <input type="number" name="horas_contratadas" id="horas_contratadas" min="1" max="10000" required
+                       placeholder="Ex: 320" oninput="validateForm()">
+            </div>
+
+            <div class="form-group">
+                <label for="qtd_profissionais">
+                    Número de Profissionais
+                    <div class="label-description">Quantas pessoas trabalharão no projeto</div>
+                </label>
+                <input type="number" name="qtd_profissionais" id="qtd_profissionais" min="1" max="20" required
+                       placeholder="Ex: 2" oninput="validateForm()">
+            </div>
+
+            <button type="submit" class="btn" id="submitBtn" disabled>
+                Avançar para Alocação de Horas →
+            </button>
+        </form>
+    </div>
+
+    <script>
+        // Definir data mínima como hoje
+        const today = new Date().toISOString().split('T')[0];
+        document.getElementById('data_contrato').min = today;
+        document.getElementById('prazo').min = today;
+
+        function calculateDuration() {
+            const dataContrato = document.getElementById('data_contrato').value;
+            const prazo = document.getElementById('prazo').value;
+            const durationDisplay = document.getElementById('durationDisplay');
+            const durationText = document.getElementById('durationText');
+
+            if (dataContrato && prazo) {
+                const inicio = new Date(dataContrato);
+                const fim = new Date(prazo);
+
+                if (fim <= inicio) {
+                    document.getElementById('prazo').setCustomValidity('A data de prazo deve ser posterior à data do contrato');
+                    durationDisplay.classList.remove('show');
+                    return;
+                } else {
+                    document.getElementById('prazo').setCustomValidity('');
+                }
+
+                // Calcular diferença em dias e meses
+                const diffTime = Math.abs(fim - inicio);
+                const diffDays = Math.ceil(diffTime / (1000 * 60 * 60 * 24));
+                const diffMonths = Math.ceil(diffDays / 30);
+
+                let durationString = '';
+                if (diffDays <= 30) {
+                    durationString = `Duração: ${diffDays} dia${diffDays > 1 ? 's' : ''}`;
+                } else {
+                    durationString = `Duração: ${diffMonths} mês/meses (${diffDays} dias)`;
+                }
+
+                durationText.textContent = durationString;
+                durationDisplay.classList.add('show');
+
+                // Atualizar info das datas
+                document.getElementById('contratoInfo').textContent =
+                    `Início: ${new Date(dataContrato).toLocaleDateString('pt-BR')}`;
+                document.getElementById('prazoInfo').textContent =
+                    `Entrega: ${new Date(prazo).toLocaleDateString('pt-BR')}`;
+            } else {
+                durationDisplay.classList.remove('show');
+                document.getElementById('contratoInfo').textContent = '';
+                document.getElementById('prazoInfo').textContent = '';
+            }
+
+            validateForm();
+        }
+
+        function validateForm() {
+            const dataContrato = document.getElementById('data_contrato').value;
+            const prazo = document.getElementById('prazo').value;
+            const horas = document.getElementById('horas_contratadas').value;
+            const qtdProf = document.getElementById('qtd_profissionais').value;
+            const submitBtn = document.getElementById('submitBtn');
+
+            const isValid = dataContrato && prazo && horas && qtdProf &&
+                           parseInt(horas) > 0 && parseInt(qtdProf) > 0 &&
+                           new Date(prazo) > new Date(dataContrato);
+
+            submitBtn.disabled = !isValid;
+
+            if (isValid) {
+                submitBtn.textContent = `Alocar ${horas}h entre ${qtdProf} profissional${qtdProf > 1 ? 'is' : ''} →`;
+            } else {
+                submitBtn.textContent = 'Avançar para Alocação de Horas →';
+            }
+        }
+
+        // Validações em tempo real
+        document.getElementById('horas_contratadas').addEventListener('input', function() {
+            if (this.value > 10000) {
+                this.setCustomValidity('Máximo de 10.000 horas por projeto');
+            } else if (this.value < 1) {
+                this.setCustomValidity('Mínimo de 1 hora');
+            } else {
+                this.setCustomValidity('');
+            }
+        });
+
+        document.getElementById('qtd_profissionais').addEventListener('input', function() {
+            if (this.value > 20) {
+                this.setCustomValidity('Máximo de 20 profissionais por projeto');
+            } else if (this.value < 1) {
+                this.setCustomValidity('Mínimo de 1 profissional');
+            } else {
+                this.setCustomValidity('');
+            }
+        });
+
+        // Atualizar data mínima do prazo quando data do contrato mudar
+        document.getElementById('data_contrato').addEventListener('change', function() {
+            const prazoInput = document.getElementById('prazo');
+            prazoInput.min = this.value;
+            if (prazoInput.value && prazoInput.value <= this.value) {
+                prazoInput.value = '';
+            }
+        });
+
+        // Animação de entrada
+        document.addEventListener('DOMContentLoaded', function() {
+            document.querySelector('.container').style.animation = 'fadeInUp 0.6s ease forwards';
+        });
+
+        const style = document.createElement('style');
+        style.textContent = `
+            @keyframes fadeInUp {
+                from {
+                    opacity: 0;
+                    transform: translateY(30px);
+                }
+                to {
+                    opacity: 1;
+                    transform: translateY(0);
+                }
+            }
+        `;
+        document.head.appendChild(style);
+    </script>
+</body>
+</html>

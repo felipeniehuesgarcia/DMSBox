@@ -1,0 +1,235 @@
+<!DOCTYPE html>
+<html lang="pt-br">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Alocar Horas por Profissional</title>
+    <style>
+        /* Variáveis de tema */
+        :root {
+            --primary: #3498db;
+            --primary-dark: #2980b9;
+            --background: #ecf0f1;
+            --card-bg: #ffffff;
+            --text-color: #2c3e50;
+            --subtext-color: #555;
+            --input-border: #ccc;
+            --input-focus: #3498db;
+            --radius: 8px;
+            --gap: 24px;
+        }
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+        }
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background-color: var(--background);
+            padding: 20px;
+            color: var(--text-color);
+        }
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            background: var(--card-bg);
+            padding: 32px;
+            border-radius: var(--radius);
+            box-shadow: 0 4px 10px rgba(0,0,0,0.05);
+        }
+        h1 {
+            text-align: center;
+            margin-bottom: 24px;
+            font-size: 2rem;
+            color: var(--text-color);
+        }
+        form {
+            display: flex;
+            flex-direction: column;
+        }
+        .prof-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+            gap: var(--gap);
+            margin-bottom: var(--gap);
+        }
+        .prof-block {
+            background: var(--card-bg);
+            padding: 20px;
+            border-radius: var(--radius);
+            box-shadow: 0 2px 6px rgba(0,0,0,0.05);
+            display: flex;
+            flex-direction: column;
+        }
+        .prof-block label {
+            font-weight: 600;
+            margin-bottom: 8px;
+            font-size: 0.95rem;
+        }
+        select,
+        input[type="number"] {
+            width: 100%;
+            padding: 10px 12px;
+            margin-bottom: 16px;
+            font-size: 0.95rem;
+            border-radius: var(--radius);
+            border: 1px solid var(--input-border);
+            transition: border 0.2s;
+        }
+        select:focus,
+        input[type="number"]:focus {
+            outline: none;
+            border-color: var(--input-focus);
+            box-shadow: 0 0 0 2px rgba(52, 152, 219, 0.2);
+        }
+        .disponibilidade {
+            font-size: 0.85rem;
+            color: var(--subtext-color);
+            margin-bottom: 6px;
+        }
+        .mark-block {
+            display: flex;
+            flex-wrap: wrap;
+            align-items: flex-end;
+            gap: 16px;
+            margin-bottom: var(--gap);
+        }
+        .mark-block input {
+            flex: 1;
+            max-width: 200px;
+        }
+        .totais {
+            display: flex;
+            flex-wrap: wrap;
+            justify-content: space-between;
+            align-items: center;
+            background: var(--primary);
+            color: #fff;
+            padding: 20px;
+            border-radius: var(--radius);
+        }
+        .totais span {
+            font-size: 1.1rem;
+            margin: 8px 0;
+        }
+        button[type="submit"] {
+            padding: 14px;
+            background-color: var(--primary);
+            color: #fff;
+            border: none;
+            border-radius: var(--radius);
+            font-size: 1rem;
+            cursor: pointer;
+            margin-top: var(--gap);
+            transition: background 0.2s;
+        }
+        button[type="submit"]:hover {
+            background-color: var(--primary-dark);
+        }
+        @media (max-width: 600px) {
+            .totais {
+                flex-direction: column;
+                text-align: center;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>Alocar Horas por Profissional</h1>
+        <form method="POST" action="/resultado" oninput="calcularTotais()">
+            <div class="prof-grid">
+                {% for i in range(qtd) %}
+                <div class="prof-block">
+                    <label for="profissional_{{ i }}">Profissional {{ i+1 }}</label>
+                    <select name="profissional_{{ i }}" id="profissional_{{ i }}" required onchange="atualizarDisponibilidade({{ i }})">
+                        <option value="" disabled selected>Selecione um profissional</option>
+                        {% for prof in profissionais %}
+                        <option value="{{ prof.nome }}">{{ prof.nome }} | {{ prof.nivel }} | R$ {{ prof.valor_hora }}/h</option>
+                        {% endfor %}
+                    </select>
+                    {% for m in range(meses) %}
+                    <div>
+                        <div class="disponibilidade" id="disponivel_{{ i }}_{{ m }}">Horas disponíveis: —</div>
+                        <label for="mes_{{ i }}_{{ m }}">Horas - Mês {{ m+1 }}</label>
+                        <input type="number" name="mes_{{ i }}_{{ m }}" id="mes_{{ i }}_{{ m }}" min="0" required oninput="validarLimiteMensal({{ i }}, {{ m }})">
+                    </div>
+                    {% endfor %}
+                </div>
+                {% endfor %}
+            </div>
+            <div class="mark-block">
+                <label for="markup">Markup (%)</label>
+                <input type="number" id="markup" name="markup" min="0" placeholder="Ex: 20">
+            </div>
+            <div class="totais">
+                <span id="custoTotal">Custo Total: R$ 0,00</span>
+                <span id="valorFinal">Valor Final com Markup: R$ 0,00</span>
+            </div>
+        </form>
+    </div>
+    <script>
+        const profissionais = {{ profissionais|tojson }};
+        const qtd = {{ qtd }};
+        const meses = {{ meses }};
+
+        function atualizarDisponibilidade(i) {
+            const select = document.getElementById(`profissional_${i}`);
+            const prof = profissionais.find(p => p.nome === select.value);
+
+            for (let m = 0; m < meses; m++) {
+                const span = document.getElementById(`disponivel_${i}_${m}`);
+                const input = document.getElementById(`mes_${i}_${m}`);
+                if (prof && prof.horas_mensais?.[m] !== undefined) {
+                    const disponivel = prof.horas_mensais[m];
+                    span.textContent = `Horas disponíveis: ${disponivel}h`;
+                    input.max = disponivel;
+                } else {
+                    span.textContent = `Horas disponíveis: —`;
+                    input.removeAttribute("max");
+                }
+            }
+            calcularTotais();
+        }
+
+        function validarLimiteMensal(i, m) {
+            const select = document.getElementById(`profissional_${i}`);
+            const prof = profissionais.find(p => p.nome === select.value);
+            const input = document.getElementById(`mes_${i}_${m}`);
+
+            if (prof && prof.horas_mensais?.[m] !== undefined) {
+                const max = prof.horas_mensais[m];
+                const valor = parseFloat(input.value || '0');
+
+                if (valor > max) {
+                    input.style.borderColor = 'red';
+                    input.setCustomValidity(`Este profissional tem no máximo ${max}h no mês ${m+1}`);
+                } else {
+                    input.style.borderColor = '';
+                    input.setCustomValidity('');
+                }
+            }
+            calcularTotais();
+        }
+
+        function calcularTotais() {
+            let total = 0;
+            for (let i = 0; i < qtd; i++) {
+                const select = document.getElementById(`profissional_${i}`);
+                if (!select?.value) continue;
+                const prof = profissionais.find(p => p.nome === select.value);
+                let somaHoras = 0;
+                for (let m = 0; m < meses; m++) {
+                    somaHoras += parseFloat(document.getElementById(`mes_${i}_${m}`)?.value || '0');
+                }
+                if (prof) total += somaHoras * prof.valor_hora;
+            }
+            const markup = parseFloat(document.getElementById('markup')?.value || '0');
+            const final = total * (1 + markup/100);
+
+            document.getElementById('custoTotal').textContent = `Custo Total: R$ ${total.toLocaleString('pt-BR', {minimumFractionDigits:2})}`;
+            document.getElementById('valorFinal').textContent = `Valor Final com Markup: R$ ${final.toLocaleString('pt-BR', {minimumFractionDigits:2})}`;
+        }
+    </script>
+</body>
+</html>

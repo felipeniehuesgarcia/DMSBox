@@ -1,0 +1,342 @@
+<!DOCTYPE html>
+<html lang="pt-br">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Dados do Projeto Recorrente</title>
+    <style>
+        :root {
+            --primary: #667eea;
+            --primary-dark: #5a6fd8;
+            --secondary: #764ba2;
+            --accent: #f093fb;
+            --background: #f8fafc;
+            --surface: #ffffff;
+            --text-primary: #1a202c;
+            --text-secondary: #718096;
+            --border: #e2e8f0;
+            --shadow: 0 10px 25px rgba(0,0,0,0.05);
+            --shadow-lg: 0 20px 40px rgba(0,0,0,0.1);
+            --radius: 16px;
+            --transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+            background: linear-gradient(135deg, var(--background) 0%, #e8f2ff 100%);
+            color: var(--text-primary);
+            line-height: 1.6;
+            min-height: 100vh;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            padding: 2rem;
+        }
+
+        .back-button {
+            position: absolute;
+            top: 2rem;
+            left: 2rem;
+            background: var(--surface);
+            border: 1px solid var(--border);
+            border-radius: 50%;
+            width: 50px;
+            height: 50px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: var(--text-secondary);
+            text-decoration: none;
+            transition: var(--transition);
+            box-shadow: var(--shadow);
+        }
+
+        .back-button:hover {
+            background: var(--primary);
+            color: white;
+            transform: translateY(-2px);
+        }
+
+        .container {
+            background: var(--surface);
+            padding: 3rem;
+            border-radius: var(--radius);
+            box-shadow: var(--shadow-lg);
+            width: 100%;
+            max-width: 500px;
+            backdrop-filter: blur(10px);
+            border: 1px solid var(--border);
+        }
+
+        .header {
+            text-align: center;
+            margin-bottom: 2rem;
+        }
+
+        .header .icon {
+            width: 70px;
+            height: 70px;
+            background: linear-gradient(135deg, var(--primary) 0%, var(--accent) 100%);
+            border-radius: 20px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin: 0 auto 1rem;
+            font-size: 2rem;
+        }
+
+        h1 {
+            font-size: 2rem;
+            font-weight: 800;
+            color: var(--text-primary);
+            margin-bottom: 0.5rem;
+        }
+
+        .subtitle {
+            color: var(--text-secondary);
+            font-size: 1rem;
+        }
+
+        .form-group {
+            margin-bottom: 1.5rem;
+        }
+
+        label {
+            display: block;
+            font-weight: 600;
+            color: var(--text-primary);
+            margin-bottom: 0.5rem;
+            font-size: 0.95rem;
+        }
+
+        .label-description {
+            font-size: 0.85rem;
+            color: var(--text-secondary);
+            font-weight: normal;
+            margin-top: 0.25rem;
+        }
+
+        input[type="number"],
+        input[type="date"] {
+            width: 100%;
+            padding: 1rem;
+            border: 2px solid var(--border);
+            border-radius: 8px;
+            font-size: 1rem;
+            transition: var(--transition);
+            background: var(--surface);
+            color: var(--text-primary);
+        }
+
+        input[type="number"]:focus,
+        input[type="date"]:focus {
+            outline: none;
+            border-color: var(--primary);
+            box-shadow: 0 0 0 3px rgba(102, 126, 234, 0.1);
+        }
+
+        input[type="number"]:invalid,
+        input[type="date"]:invalid {
+            border-color: #ef4444;
+        }
+
+        .input-group {
+            position: relative;
+        }
+
+        .input-prefix {
+            position: absolute;
+            left: 1rem;
+            top: 50%;
+            transform: translateY(-50%);
+            color: var(--text-secondary);
+            font-weight: 600;
+            pointer-events: none;
+        }
+
+        .input-group input {
+            padding-left: 3rem;
+        }
+
+        .btn {
+            width: 100%;
+            padding: 1rem;
+            background: linear-gradient(135deg, var(--primary) 0%, var(--primary-dark) 100%);
+            color: white;
+            border: none;
+            border-radius: 8px;
+            font-size: 1rem;
+            font-weight: 600;
+            cursor: pointer;
+            transition: var(--transition);
+            margin-top: 1rem;
+        }
+
+        .btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 8px 20px rgba(102, 126, 234, 0.3);
+        }
+
+        .btn:disabled {
+            opacity: 0.5;
+            cursor: not-allowed;
+            transform: none;
+        }
+
+        .info-card {
+            background: linear-gradient(135deg, rgba(102, 126, 234, 0.05) 0%, rgba(248, 250, 252, 1) 100%);
+            border: 1px solid rgba(102, 126, 234, 0.2);
+            border-radius: 8px;
+            padding: 1rem;
+            margin-bottom: 1.5rem;
+        }
+
+        .info-card .icon {
+            display: inline-block;
+            margin-right: 0.5rem;
+        }
+
+        .info-card p {
+            color: var(--text-secondary);
+            font-size: 0.9rem;
+            margin: 0;
+        }
+
+        @media (max-width: 768px) {
+            body {
+                padding: 1rem;
+            }
+
+            .container {
+                padding: 2rem 1.5rem;
+            }
+
+            h1 {
+                font-size: 1.5rem;
+            }
+
+            .back-button {
+                position: fixed;
+            }
+        }
+    </style>
+</head>
+<body>
+    <a href="/" class="back-button">←</a>
+
+    <div class="container">
+        <div class="header">
+            <div class="icon">🔄</div>
+            <h1>Projeto Recorrente</h1>
+            <p class="subtitle">Configure os dados básicos do seu projeto mensal</p>
+        </div>
+
+        <div class="info-card">
+            <span class="icon">💡</span>
+            <p>Projetos recorrentes são ideais para contratos mensais com equipes dedicadas e escopo contínuo.</p>
+        </div>
+
+        <form method="POST" id="projectForm">
+            <div class="form-group">
+                <label for="quantidade">
+                    Quantidade de Profissionais
+                    <div class="label-description">Número de pessoas que trabalharão no projeto</div>
+                </label>
+                <input type="number" name="quantidade" id="quantidade" min="1" max="20" required
+                       placeholder="Ex: 3" oninput="validateForm()">
+            </div>
+
+            <div class="form-group">
+                <label for="inicio">
+                    Data de Início do Contrato
+                    <div class="label-description">Quando o projeto começará</div>
+                </label>
+                <input type="date" name="inicio" id="inicio" required onchange="validateForm()">
+            </div>
+
+            <div class="form-group">
+                <label for="vigencia">
+                    Vigência do Contrato (meses)
+                    <div class="label-description">Por quantos meses o contrato será válido</div>
+                </label>
+                <input type="number" name="vigencia" id="vigencia" min="1" max="60" required
+                       placeholder="Ex: 12" oninput="validateForm()">
+            </div>
+
+            <button type="submit" class="btn" id="submitBtn" disabled>
+                Avançar para Seleção de Profissionais →
+            </button>
+        </form>
+    </div>
+
+    <script>
+        // Definir data mínima como hoje
+        document.getElementById('inicio').min = new Date().toISOString().split('T')[0];
+
+        function validateForm() {
+            const quantidade = document.getElementById('quantidade').value;
+            const inicio = document.getElementById('inicio').value;
+            const vigencia = document.getElementById('vigencia').value;
+            const submitBtn = document.getElementById('submitBtn');
+
+            const isValid = quantidade && inicio && vigencia &&
+                           parseInt(quantidade) > 0 && parseInt(vigencia) > 0;
+
+            submitBtn.disabled = !isValid;
+
+            if (isValid) {
+                submitBtn.textContent = `Avançar com ${quantidade} profissional${quantidade > 1 ? 'is' : ''} →`;
+            } else {
+                submitBtn.textContent = 'Avançar para Seleção de Profissionais →';
+            }
+        }
+
+        // Validação em tempo real
+        document.getElementById('quantidade').addEventListener('input', function() {
+            if (this.value > 20) {
+                this.setCustomValidity('Máximo de 20 profissionais por projeto');
+            } else if (this.value < 1) {
+                this.setCustomValidity('Mínimo de 1 profissional');
+            } else {
+                this.setCustomValidity('');
+            }
+        });
+
+        document.getElementById('vigencia').addEventListener('input', function() {
+            if (this.value > 60) {
+                this.setCustomValidity('Máximo de 60 meses de vigência');
+            } else if (this.value < 1) {
+                this.setCustomValidity('Mínimo de 1 mês de vigência');
+            } else {
+                this.setCustomValidity('');
+            }
+        });
+
+        // Animação de entrada
+        document.addEventListener('DOMContentLoaded', function() {
+            document.querySelector('.container').style.animation = 'fadeInUp 0.6s ease forwards';
+        });
+
+        const style = document.createElement('style');
+        style.textContent = `
+            @keyframes fadeInUp {
+                from {
+                    opacity: 0;
+                    transform: translateY(30px);
+                }
+                to {
+                    opacity: 1;
+                    transform: translateY(0);
+                }
+            }
+        `;
+        document.head.appendChild(style);
+    </script>
+</body>
+</html>

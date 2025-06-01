@@ -1,0 +1,76 @@
+from flask import Flask, render_template, request, redirect, url_for
+from datetime import datetime
+import json
+
+from google_sheets import GoogleSheetsReader
+
+app = Flask(__name__)
+
+# Rota principal - página inicial modernizada
+@app.route('/')
+def index():
+    return render_template('index.html')
+
+# Rota para seleção do tipo de projeto
+@app.route('/tipo_projeto')
+def tipo_projeto():
+    return render_template('tipo_projeto.html')
+
+@app.route('/selecionar_tipo', methods=['POST'])
+def selecionar_tipo():
+    tipo = request.form.get('tipo')
+    if tipo == 'recorrente':
+        return redirect(url_for('dados_recorrente'))
+    else:
+        return redirect(url_for('dados_avulso'))
+
+@app.route('/dados_recorrente', methods=['GET', 'POST'])
+def dados_recorrente():
+    if request.method == 'POST':
+        quantidade = int(request.form['quantidade'])
+        inicio = request.form['inicio']
+        vigencia = request.form['vigencia']
+        profissionais_disponiveis = GoogleSheetsReader().profissionais_disponiveis_recorrente(
+            datetime.strptime(inicio, "%Y-%m-%d"), int(vigencia)
+        )
+
+        return render_template('selecionar.html',
+                               quantidade=quantidade,
+                               profissionais=profissionais_disponiveis,
+                               inicio=inicio,
+                               vigencia=vigencia)
+    return render_template('dados_recorrente.html')
+
+@app.route('/dados_avulso', methods=['GET', 'POST'])
+def dados_avulso():
+    if request.method == 'POST':
+        data_contrato = request.form['data_contrato']
+        prazo = request.form['prazo']
+        qtd_profissionais = int(request.form['qtd_profissionais'])
+
+        # Calcula meses entre contrato e prazo
+        inicio = datetime.strptime(data_contrato, "%Y-%m-%d")
+        fim = datetime.strptime(prazo, "%Y-%m-%d")
+        profissionais_disponiveis = GoogleSheetsReader().profissionais_disponiveis_avulso(inicio, fim)
+        total_meses = (fim.year - inicio.year) * 12 + fim.month - inicio.month + 1
+
+        return render_template('alocar_avulso.html',
+                               profissionais=profissionais_disponiveis,
+                               meses=total_meses,
+                               qtd=qtd_profissionais)
+    return render_template('dados_avulso.html')
+
+# Rota para processar resultados (ainda precisa ser implementada)
+@app.route('/resultado', methods=['POST'])
+def resultado():
+    # Aqui você processará os dados do formulário e calculará os resultados
+    # Por enquanto, vou retornar uma página de resultado básica
+    return render_template('resultado.html', dados=request.form)
+
+# Rota para dashboard (futura implementação)
+@app.route('/dashboard')
+def dashboard():
+    return render_template('dashboard.html')
+
+if __name__ == '__main__':
+    app.run(debug=True)

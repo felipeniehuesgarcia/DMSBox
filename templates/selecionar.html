@@ -1,0 +1,694 @@
+<!DOCTYPE html>
+<html lang="pt-br">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Seleção de Profissionais</title>
+    <style>
+        :root {
+            --primary: #667eea;
+            --primary-dark: #5a6fd8;
+            --secondary: #764ba2;
+            --accent: #f093fb;
+            --background: #f8fafc;
+            --surface: #ffffff;
+            --text-primary: #1a202c;
+            --text-secondary: #718096;
+            --border: #e2e8f0;
+            --success: #10b981;
+            --warning: #f59e0b;
+            --error: #ef4444;
+            --shadow: 0 10px 25px rgba(0,0,0,0.05);
+            --shadow-lg: 0 20px 40px rgba(0,0,0,0.1);
+            --radius: 16px;
+            --transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+            background: linear-gradient(135deg, var(--background) 0%, #e8f2ff 100%);
+            color: var(--text-primary);
+            line-height: 1.6;
+            min-height: 100vh;
+            padding: 2rem;
+        }
+
+        .back-button {
+            position: fixed;
+            top: 2rem;
+            left: 2rem;
+            background: var(--surface);
+            border: 1px solid var(--border);
+            border-radius: 50%;
+            width: 50px;
+            height: 50px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: var(--text-secondary);
+            text-decoration: none;
+            transition: var(--transition);
+            box-shadow: var(--shadow);
+            z-index: 1000;
+        }
+
+        .back-button:hover {
+            background: var(--primary);
+            color: white;
+            transform: translateY(-2px);
+        }
+
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            background: var(--surface);
+            border-radius: var(--radius);
+            box-shadow: var(--shadow-lg);
+            overflow: hidden;
+        }
+
+        .header {
+            background: linear-gradient(135deg, var(--primary) 0%, var(--secondary) 100%);
+            color: white;
+            padding: 2rem;
+            text-align: center;
+        }
+
+        .header h1 {
+            font-size: 2.5rem;
+            font-weight: 800;
+            margin-bottom: 0.5rem;
+        }
+
+        .header p {
+            font-size: 1.1rem;
+            opacity: 0.9;
+        }
+
+        .content {
+            padding: 2rem;
+        }
+
+        .project-info {
+            background: linear-gradient(135deg, rgba(102, 126, 234, 0.05) 0%, rgba(248, 250, 252, 1) 100%);
+            border: 1px solid rgba(102, 126, 234, 0.2);
+            border-radius: 12px;
+            padding: 1.5rem;
+            margin-bottom: 2rem;
+            display: flex;
+            flex-wrap: wrap;
+            gap: 2rem;
+            justify-content: center;
+        }
+
+        .info-item {
+            text-align: center;
+        }
+
+        .info-value {
+            font-size: 1.8rem;
+            font-weight: 800;
+            color: var(--primary);
+            margin-bottom: 0.25rem;
+        }
+
+        .info-label {
+            font-size: 0.9rem;
+            color: var(--text-secondary);
+            font-weight: 600;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+
+        .professionals-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(350px, 1fr));
+            gap: 1.5rem;
+            margin-bottom: 2rem;
+        }
+
+        .professional-card {
+            background: var(--surface);
+            border: 2px solid var(--border);
+            border-radius: 12px;
+            padding: 1.5rem;
+            transition: var(--transition);
+            position: relative;
+            overflow: hidden;
+        }
+
+        .professional-card::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            height: 4px;
+            background: linear-gradient(135deg, var(--primary) 0%, var(--accent) 100%);
+            transform: scaleX(0);
+            transition: var(--transition);
+        }
+
+        .professional-card:hover {
+            transform: translateY(-3px);
+            box-shadow: var(--shadow);
+            border-color: var(--primary);
+        }
+
+        .professional-card:hover::before {
+            transform: scaleX(1);
+        }
+
+        .professional-card.filled {
+            border-color: var(--success);
+            background: linear-gradient(135deg, rgba(16, 185, 129, 0.05) 0%, var(--surface) 100%);
+        }
+
+        .professional-card.error {
+            border-color: var(--error);
+            background: linear-gradient(135deg, rgba(239, 68, 68, 0.05) 0%, var(--surface) 100%);
+        }
+
+        .card-header {
+            display: flex;
+            align-items: center;
+            margin-bottom: 1rem;
+        }
+
+        .card-number {
+            width: 40px;
+            height: 40px;
+            background: linear-gradient(135deg, var(--primary) 0%, var(--accent) 100%);
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: white;
+            font-weight: 700;
+            margin-right: 1rem;
+        }
+
+        .card-title {
+            font-size: 1.2rem;
+            font-weight: 700;
+            color: var(--text-primary);
+        }
+
+        select,
+        input[type="number"] {
+            width: 100%;
+            padding: 0.75rem;
+            border: 2px solid var(--border);
+            border-radius: 8px;
+            font-size: 0.95rem;
+            transition: var(--transition);
+            background: var(--surface);
+            color: var(--text-primary);
+            margin-bottom: 1rem;
+        }
+
+        select:focus,
+        input[type="number"]:focus {
+            outline: none;
+            border-color: var(--primary);
+            box-shadow: 0 0 0 3px rgba(102, 126, 234, 0.1);
+        }
+
+        select:invalid,
+        input[type="number"]:invalid {
+            border-color: var(--error);
+        }
+
+        .professional-info-display {
+            background: #f8fafc;
+            border-radius: 8px;
+            padding: 1rem;
+            margin-bottom: 1rem;
+            min-height: 80px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: var(--text-secondary);
+            font-style: italic;
+            transition: var(--transition);
+        }
+
+        .professional-info-display.filled {
+            background: linear-gradient(135deg, rgba(16, 185, 129, 0.1) 0%, #f8fafc 100%);
+            border: 1px solid rgba(16, 185, 129, 0.3);
+        }
+
+        .professional-details {
+            text-align: left;
+            font-style: normal;
+        }
+
+        .professional-name {
+            font-weight: 700;
+            font-size: 1.1rem;
+            color: var(--text-primary);
+            margin-bottom: 0.5rem;
+        }
+
+        .professional-specs {
+            color: var(--text-secondary);
+            font-size: 0.9rem;
+            line-height: 1.4;
+        }
+
+        .spec-item {
+            display: flex;
+            justify-content: space-between;
+            margin-bottom: 0.25rem;
+        }
+
+        .markup-section {
+            background: linear-gradient(135deg, var(--surface) 0%, #f8fafc 100%);
+            border: 2px solid var(--border);
+            border-radius: 12px;
+            padding: 2rem;
+            margin-bottom: 2rem;
+            text-align: center;
+        }
+
+        .markup-section h3 {
+            font-size: 1.3rem;
+            font-weight: 700;
+            margin-bottom: 1rem;
+            color: var(--text-primary);
+        }
+
+        .markup-input-group {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 1rem;
+            max-width: 300px;
+            margin: 0 auto;
+        }
+
+        .markup-input-group label {
+            font-weight: 600;
+            color: var(--text-primary);
+        }
+
+        .markup-input-group input {
+            flex: 1;
+            margin: 0;
+        }
+
+        .totals-section {
+            background: linear-gradient(135deg, var(--primary) 0%, var(--secondary) 100%);
+            color: white;
+            padding: 2rem;
+            border-radius: 12px;
+            margin-bottom: 2rem;
+        }
+
+        .totals-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 1.5rem;
+            text-align: center;
+        }
+
+        .total-item {
+            background: rgba(255, 255, 255, 0.1);
+            padding: 1rem;
+            border-radius: 8px;
+            backdrop-filter: blur(10px);
+        }
+
+        .total-value {
+            font-size: 1.8rem;
+            font-weight: 800;
+            margin-bottom: 0.25rem;
+        }
+
+        .total-label {
+            font-size: 0.9rem;
+            opacity: 0.9;
+        }
+
+        .submit-section {
+            text-align: center;
+        }
+
+        .btn {
+            background: linear-gradient(135deg, var(--primary) 0%, var(--primary-dark) 100%);
+            color: white;
+            border: none;
+            padding: 1rem 2rem;
+            border-radius: 8px;
+            font-size: 1rem;
+            font-weight: 600;
+            cursor: pointer;
+            transition: var(--transition);
+            min-width: 200px;
+        }
+
+        .btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 8px 20px rgba(102, 126, 234, 0.3);
+        }
+
+        .btn:disabled {
+            opacity: 0.5;
+            cursor: not-allowed;
+            transform: none;
+        }
+
+        .error-message {
+            color: var(--error);
+            font-size: 0.85rem;
+            margin-top: 0.5rem;
+            display: none;
+        }
+
+        .success-message {
+            color: var(--success);
+            font-size: 0.85rem;
+            margin-top: 0.5rem;
+            display: none;
+        }
+
+        @media (max-width: 768px) {
+            body {
+                padding: 1rem;
+            }
+
+            .header {
+                padding: 1.5rem 1rem;
+            }
+
+            .header h1 {
+                font-size: 2rem;
+            }
+
+            .content {
+                padding: 1.5rem 1rem;
+            }
+
+            .professionals-grid {
+                grid-template-columns: 1fr;
+            }
+
+            .project-info {
+                flex-direction: column;
+                gap: 1rem;
+            }
+
+            .totals-grid {
+                grid-template-columns: 1fr;
+            }
+        }
+    </style>
+</head>
+<body>
+    <a href="/dados_recorrente" class="back-button">←</a>
+
+    <div class="container">
+        <div class="header">
+            <h1>🎯 Seleção de Profissionais</h1>
+            <p>Configure sua equipe para o projeto recorrente</p>
+        </div>
+
+        <div class="content">
+            <div class="project-info">
+                <div class="info-item">
+                    <div class="info-value">{{ quantidade }}</div>
+                    <div class="info-label">Profissionais</div>
+                </div>
+                <div class="info-item">
+                    <div class="info-value">{{ vigencia }}</div>
+                    <div class="info-label">Meses</div>
+                </div>
+                <div class="info-item">
+                    <div class="info-value">{{ inicio }}</div>
+                    <div class="info-label">Início</div>
+                </div>
+            </div>
+
+            <form method="POST" action="/resultado" oninput="calcularTotal()" id="professionalsForm">
+                <div class="professionals-grid">
+                    {% for i in range(quantidade) %}
+                    <div class="professional-card" id="card_{{ i }}">
+                        <div class="card-header">
+                            <div class="card-number">{{ i+1 }}</div>
+                            <div class="card-title">Profissional {{ i+1 }}</div>
+                        </div>
+
+                        <select name="profissional_{{ i }}" id="profissional_{{ i }}"
+                                onchange="atualizarInfo({{ i }})" required>
+                            <option value="" disabled selected>🔍 Selecione um profissional</option>
+                            {% for profissional in profissionais %}
+                            <option value='{{ profissional | tojson | safe }}'>
+                                {{ profissional.nome }} | {{ profissional.nivel }} | R$ {{ profissional.valor_hora }}/h
+                            </option>
+                            {% endfor %}
+                        </select>
+
+                        <div id="info_{{ i }}" class="professional-info-display">
+                            Selecione um profissional para ver as informações
+                        </div>
+
+                        <input type="number" name="horas_{{ i }}" id="horas_{{ i }}"
+                               min="1" required placeholder="💼 Horas mensais"
+                               oninput="validarLimite({{ i }})">
+
+                        <div id="error_{{ i }}" class="error-message">
+                            Erro de validação
+                        </div>
+                        <div id="success_{{ i }}" class="success-message">
+                            ✓ Configuração válida
+                        </div>
+                    </div>
+                    {% endfor %}
+                </div>
+
+                <div class="markup-section">
+                    <h3>💰 Configuração de Markup</h3>
+                    <div class="markup-input-group">
+                        <label for="markup">Markup:</label>
+                        <input type="number" id="markup" name="markup" min="0" max="500"
+                               placeholder="0" oninput="calcularTotal()">
+                        <span>%</span>
+                    </div>
+                </div>
+
+                <div class="totals-section">
+                    <div class="totals-grid">
+                        <div class="total-item">
+                            <div class="total-value" id="totalCusto">R$ 0,00</div>
+                            <div class="total-label">Custo Mensal</div>
+                        </div>
+                        <div class="total-item">
+                            <div class="total-value" id="markupValue">0%</div>
+                            <div class="total-label">Markup</div>
+                        </div>
+                        <div class="total-item">
+                            <div class="total-value" id="valorFinal">R$ 0,00</div>
+                            <div class="total-label">Valor Final</div>
+                        </div>
+                        <div class="total-item">
+                            <div class="total-value" id="totalAnual">R$ 0,00</div>
+                            <div class="total-label">Total Anual</div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="submit-section">
+                    <button type="submit" class="btn" id="submitBtn" disabled>
+                        📊 Calcular Rentabilidade
+                    </button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <script>
+        const dadosProfissionais = {{ profissionais|tojson }};
+        const quantidade = {{ quantidade }};
+        const vigencia = {{ vigencia }};
+
+        function atualizarInfo(index) {
+            const select = document.getElementById(`profissional_${index}`);
+            const info = document.getElementById(`info_${index}`);
+            const card = document.getElementById(`card_${index}`);
+
+            try {
+                const selecionado = JSON.parse(select.value || '{}');
+
+                if (selecionado.nome) {
+                    info.innerHTML = `
+                        <div class="professional-details">
+                            <div class="professional-name">${selecionado.nome}</div>
+                            <div class="professional-specs">
+                                <div class="spec-item">
+                                    <span>Nível:</span>
+                                    <strong>${selecionado.nivel}</strong>
+                                </div>
+                                <div class="spec-item">
+                                    <span>Valor/hora:</span>
+                                    <strong>R$ ${selecionado.valor_hora}</strong>
+                                </div>
+                                <div class="spec-item">
+                                    <span>Disponível:</span>
+                                    <strong>${selecionado.horas_disponiveis}h</strong>
+                                </div>
+                            </div>
+                        </div>
+                    `;
+                    info.classList.add('filled');
+                } else {
+                    info.innerHTML = 'Selecione um profissional para ver as informações';
+                    info.classList.remove('filled');
+                }
+            } catch (e) {
+                info.innerHTML = 'Erro ao carregar informações';
+                info.classList.remove('filled');
+            }
+
+            validarLimite(index);
+        }
+
+        function validarLimite(index) {
+            const select = document.getElementById(`profissional_${index}`);
+            const input = document.getElementById(`horas_${index}`);
+            const card = document.getElementById(`card_${index}`);
+            const errorMsg = document.getElementById(`error_${index}`);
+            const successMsg = document.getElementById(`success_${index}`);
+
+            // Limpar estados anteriores
+            card.classList.remove('error', 'filled');
+            errorMsg.style.display = 'none';
+            successMsg.style.display = 'none';
+
+            try {
+                const prof = JSON.parse(select.value || '{}');
+                const horas = parseInt(input.value || '0');
+
+                if (prof.horas_disponiveis && horas > 0) {
+                    const max = prof.horas_disponiveis;
+
+                    if (horas > max) {
+                        card.classList.add('error');
+                        input.setCustomValidity(`Este profissional só tem ${max} horas disponíveis.`);
+                        errorMsg.textContent = `⚠️ Máximo ${max} horas disponíveis`;
+                        errorMsg.style.display = 'block';
+                    } else {
+                        card.classList.add('filled');
+                        input.setCustomValidity('');
+                        successMsg.textContent = `✓ ${horas}h de ${max}h disponíveis`;
+                        successMsg.style.display = 'block';
+                    }
+                } else if (horas > 0) {
+                    card.classList.add('filled');
+                    successMsg.textContent = '✓ Configuração válida';
+                    successMsg.style.display = 'block';
+                }
+            } catch (e) {
+                // Erro no parsing do JSON
+            }
+
+            calcularTotal();
+            validarFormulario();
+        }
+
+        function calcularTotal() {
+            let totalCusto = 0;
+            let profissionaisValidos = 0;
+
+            for (let i = 0; i < quantidade; i++) {
+                try {
+                    const select = document.getElementById(`profissional_${i}`);
+                    const input = document.getElementById(`horas_${i}`);
+
+                    if (select.value && input.value) {
+                        const prof = JSON.parse(select.value);
+                        const horas = parseFloat(input.value || '0');
+
+                        if (prof.valor_hora && horas > 0) {
+                            totalCusto += prof.valor_hora * horas;
+                            profissionaisValidos++;
+                        }
+                    }
+                } catch (e) {
+                    // Erro no parsing, ignorar
+                }
+            }
+
+            const markup = parseFloat(document.getElementById('markup').value || '0');
+            const valorFinal = totalCusto * (1 + markup / 100);
+            const totalAnual = valorFinal * vigencia;
+
+            // Atualizar display
+            document.getElementById('totalCusto').textContent =
+                `R$ ${totalCusto.toLocaleString('pt-BR', {minimumFractionDigits: 2})}`;
+            document.getElementById('markupValue').textContent = `${markup}%`;
+            document.getElementById('valorFinal').textContent =
+                `R$ ${valorFinal.toLocaleString('pt-BR', {minimumFractionDigits: 2})}`;
+            document.getElementById('totalAnual').textContent =
+                `R$ ${totalAnual.toLocaleString('pt-BR', {minimumFractionDigits: 2})}`;
+        }
+
+        function validarFormulario() {
+            const submitBtn = document.getElementById('submitBtn');
+            let todosPreenchidos = true;
+            let todosValidos = true;
+
+            for (let i = 0; i < quantidade; i++) {
+                const select = document.getElementById(`profissional_${i}`);
+                const input = document.getElementById(`horas_${i}`);
+
+                if (!select.value || !input.value || input.value <= 0) {
+                    todosPreenchidos = false;
+                }
+
+                if (!input.checkValidity()) {
+                    todosValidos = false;
+                }
+            }
+
+            const isValid = todosPreenchidos && todosValidos;
+            submitBtn.disabled = !isValid;
+
+            if (isValid) {
+                submitBtn.textContent = '🚀 Calcular Rentabilidade';
+            } else {
+                submitBtn.textContent = '📊 Calcular Rentabilidade';
+            }
+        }
+
+        // Animações de entrada
+        document.addEventListener('DOMContentLoaded', function() {
+            const cards = document.querySelectorAll('.professional-card');
+            cards.forEach((card, index) => {
+                card.style.animationDelay = `${index * 0.1}s`;
+                card.style.animation = 'fadeInUp 0.6s ease forwards';
+            });
+        });
+
+        const style = document.createElement('style');
+        style.textContent = `
+            @keyframes fadeInUp {
+                from {
+                    opacity: 0;
+                    transform: translateY(30px);
+                }
+                to {
+                    opacity: 1;
+                    transform: translateY(0);
+                }
+            }
+        `;
+        document.head.appendChild(style);
+    </script>
+</body>
+</html>

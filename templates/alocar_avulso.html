@@ -1,0 +1,862 @@
+<!DOCTYPE html>
+<html lang="pt-br">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Alocação de Horas - Projeto Avulso</title>
+    <style>
+        :root {
+            --primary: #667eea;
+            --primary-dark: #5a6fd8;
+            --secondary: #764ba2;
+            --accent: #f093fb;
+            --background: #f8fafc;
+            --surface: #ffffff;
+            --text-primary: #1a202c;
+            --text-secondary: #718096;
+            --border: #e2e8f0;
+            --success: #10b981;
+            --warning: #f59e0b;
+            --error: #ef4444;
+            --shadow: 0 10px 25px rgba(0,0,0,0.05);
+            --shadow-lg: 0 20px 40px rgba(0,0,0,0.1);
+            --radius: 16px;
+            --transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+            background: linear-gradient(135deg, var(--background) 0%, #e8f2ff 100%);
+            color: var(--text-primary);
+            line-height: 1.6;
+            min-height: 100vh;
+            padding: 2rem;
+        }
+
+        .back-button {
+            position: fixed;
+            top: 2rem;
+            left: 2rem;
+            background: var(--surface);
+            border: 1px solid var(--border);
+            border-radius: 50%;
+            width: 50px;
+            height: 50px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: var(--text-secondary);
+            text-decoration: none;
+            transition: var(--transition);
+            box-shadow: var(--shadow);
+            z-index: 1000;
+        }
+
+        .back-button:hover {
+            background: var(--primary);
+            color: white;
+            transform: translateY(-2px);
+        }
+
+        .container {
+            max-width: 1400px;
+            margin: 0 auto;
+            background: var(--surface);
+            border-radius: var(--radius);
+            box-shadow: var(--shadow-lg);
+            overflow: hidden;
+        }
+
+        .header {
+            background: linear-gradient(135deg, var(--primary) 0%, var(--secondary) 100%);
+            color: white;
+            padding: 2rem;
+            text-align: center;
+        }
+
+        .header h1 {
+            font-size: 2.5rem;
+            font-weight: 800;
+            margin-bottom: 0.5rem;
+        }
+
+        .header p {
+            font-size: 1.1rem;
+            opacity: 0.9;
+        }
+
+        .content {
+            padding: 2rem;
+        }
+
+        .project-summary {
+            background: linear-gradient(135deg, rgba(102, 126, 234, 0.05) 0%, rgba(248, 250, 252, 1) 100%);
+            border: 1px solid rgba(102, 126, 234, 0.2);
+            border-radius: 12px;
+            padding: 1.5rem;
+            margin-bottom: 2rem;
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+            gap: 1.5rem;
+            text-align: center;
+        }
+
+        .summary-item {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+        }
+
+        .summary-value {
+            font-size: 1.8rem;
+            font-weight: 800;
+            color: var(--primary);
+            margin-bottom: 0.25rem;
+        }
+
+        .summary-label {
+            font-size: 0.85rem;
+            color: var(--text-secondary);
+            font-weight: 600;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+
+        .timeline-header {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin-bottom: 2rem;
+            gap: 1rem;
+        }
+
+        .timeline-header h2 {
+            font-size: 1.5rem;
+            font-weight: 700;
+            color: var(--text-primary);
+        }
+
+        .month-tabs {
+            display: flex;
+            background: var(--border);
+            border-radius: 8px;
+            padding: 0.25rem;
+            overflow-x: auto;
+        }
+
+        .month-tab {
+            padding: 0.5rem 1rem;
+            background: transparent;
+            border: none;
+            border-radius: 6px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: var(--transition);
+            white-space: nowrap;
+            color: var(--text-secondary);
+        }
+
+        .month-tab.active {
+            background: var(--primary);
+            color: white;
+        }
+
+        .professionals-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(400px, 1fr));
+            gap: 1.5rem;
+            margin-bottom: 2rem;
+        }
+
+        .professional-card {
+            background: var(--surface);
+            border: 2px solid var(--border);
+            border-radius: 12px;
+            padding: 1.5rem;
+            transition: var(--transition);
+            position: relative;
+            overflow: hidden;
+        }
+
+        .professional-card::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            height: 4px;
+            background: linear-gradient(135deg, var(--primary) 0%, var(--accent) 100%);
+            transform: scaleX(0);
+            transition: var(--transition);
+        }
+
+        .professional-card:hover {
+            transform: translateY(-3px);
+            box-shadow: var(--shadow);
+            border-color: var(--primary);
+        }
+
+        .professional-card:hover::before {
+            transform: scaleX(1);
+        }
+
+        .professional-card.filled {
+            border-color: var(--success);
+            background: linear-gradient(135deg, rgba(16, 185, 129, 0.05) 0%, var(--surface) 100%);
+        }
+
+        .professional-card.error {
+            border-color: var(--error);
+            background: linear-gradient(135deg, rgba(239, 68, 68, 0.05) 0%, var(--surface) 100%);
+        }
+
+        .card-header {
+            display: flex;
+            align-items: center;
+            margin-bottom: 1.5rem;
+        }
+
+        .card-number {
+            width: 45px;
+            height: 45px;
+            background: linear-gradient(135deg, var(--primary) 0%, var(--accent) 100%);
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: white;
+            font-weight: 700;
+            margin-right: 1rem;
+            font-size: 1.1rem;
+        }
+
+        .card-title {
+            font-size: 1.2rem;
+            font-weight: 700;
+            color: var(--text-primary);
+        }
+
+        select {
+            width: 100%;
+            padding: 0.75rem;
+            border: 2px solid var(--border);
+            border-radius: 8px;
+            font-size: 0.95rem;
+            transition: var(--transition);
+            background: var(--surface);
+            color: var(--text-primary);
+            margin-bottom: 1rem;
+        }
+
+        select:focus {
+            outline: none;
+            border-color: var(--primary);
+            box-shadow: 0 0 0 3px rgba(102, 126, 234, 0.1);
+        }
+
+        .professional-info {
+            background: #f8fafc;
+            border-radius: 8px;
+            padding: 1rem;
+            margin-bottom: 1rem;
+            min-height: 80px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: var(--text-secondary);
+            font-style: italic;
+            transition: var(--transition);
+        }
+
+        .professional-info.filled {
+            background: linear-gradient(135deg, rgba(16, 185, 129, 0.1) 0%, #f8fafc 100%);
+            border: 1px solid rgba(16, 185, 129, 0.3);
+        }
+
+        .professional-details {
+            text-align: left;
+            font-style: normal;
+            width: 100%;
+        }
+
+        .professional-name {
+            font-weight: 700;
+            font-size: 1.1rem;
+            color: var(--text-primary);
+            margin-bottom: 0.5rem;
+        }
+
+        .professional-specs {
+            color: var(--text-secondary);
+            font-size: 0.9rem;
+            line-height: 1.4;
+        }
+
+        .spec-row {
+            display: flex;
+            justify-content: space-between;
+            margin-bottom: 0.25rem;
+        }
+
+        .months-allocation {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(120px, 1fr));
+            gap: 0.75rem;
+        }
+
+        .month-input-group {
+            position: relative;
+        }
+
+        .month-label {
+            font-size: 0.8rem;
+            font-weight: 600;
+            color: var(--text-secondary);
+            margin-bottom: 0.25rem;
+            display: block;
+        }
+
+        .availability-info {
+            font-size: 0.75rem;
+            color: var(--primary);
+            margin-bottom: 0.5rem;
+            font-weight: 500;
+        }
+
+        .month-input {
+            width: 100%;
+            padding: 0.5rem;
+            border: 2px solid var(--border);
+            border-radius: 6px;
+            font-size: 0.9rem;
+            transition: var(--transition);
+            background: var(--surface);
+            text-align: center;
+        }
+
+        .month-input:focus {
+            outline: none;
+            border-color: var(--primary);
+            box-shadow: 0 0 0 2px rgba(102, 126, 234, 0.1);
+        }
+
+        .month-input.error {
+            border-color: var(--error);
+            background: rgba(239, 68, 68, 0.05);
+        }
+
+        .month-input.success {
+            border-color: var(--success);
+            background: rgba(16, 185, 129, 0.05);
+        }
+
+        .markup-section {
+            background: linear-gradient(135deg, var(--surface) 0%, #f8fafc 100%);
+            border: 2px solid var(--border);
+            border-radius: 12px;
+            padding: 2rem;
+            margin-bottom: 2rem;
+            text-align: center;
+        }
+
+        .markup-section h3 {
+            font-size: 1.3rem;
+            font-weight: 700;
+            margin-bottom: 1rem;
+            color: var(--text-primary);
+        }
+
+        .markup-input-group {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 1rem;
+            max-width: 300px;
+            margin: 0 auto;
+        }
+
+        .markup-input-group label {
+            font-weight: 600;
+            color: var(--text-primary);
+        }
+
+        .markup-input-group input {
+            flex: 1;
+            padding: 0.75rem;
+            border: 2px solid var(--border);
+            border-radius: 8px;
+            font-size: 1rem;
+            text-align: center;
+        }
+
+        .totals-section {
+            background: linear-gradient(135deg, var(--primary) 0%, var(--secondary) 100%);
+            color: white;
+            padding: 2rem;
+            border-radius: 12px;
+            margin-bottom: 2rem;
+        }
+
+        .totals-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 1.5rem;
+            text-align: center;
+        }
+
+        .total-item {
+            background: rgba(255, 255, 255, 0.1);
+            padding: 1rem;
+            border-radius: 8px;
+            backdrop-filter: blur(10px);
+        }
+
+        .total-value {
+            font-size: 1.8rem;
+            font-weight: 800;
+            margin-bottom: 0.25rem;
+        }
+
+        .total-label {
+            font-size: 0.9rem;
+            opacity: 0.9;
+        }
+
+        .submit-section {
+            text-align: center;
+        }
+
+        .btn {
+            background: linear-gradient(135deg, var(--primary) 0%, var(--primary-dark) 100%);
+            color: white;
+            border: none;
+            padding: 1rem 2rem;
+            border-radius: 8px;
+            font-size: 1rem;
+            font-weight: 600;
+            cursor: pointer;
+            transition: var(--transition);
+            min-width: 250px;
+        }
+
+        .btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 8px 20px rgba(102, 126, 234, 0.3);
+        }
+
+        .btn:disabled {
+            opacity: 0.5;
+            cursor: not-allowed;
+            transform: none;
+        }
+
+        .progress-indicator {
+            background: linear-gradient(135deg, rgba(102, 126, 234, 0.1) 0%, rgba(248, 250, 252, 1) 100%);
+            border: 1px solid rgba(102, 126, 234, 0.3);
+            border-radius: 8px;
+            padding: 1rem;
+            margin-bottom: 2rem;
+            text-align: center;
+        }
+
+        .progress-bar {
+            background: var(--border);
+            height: 8px;
+            border-radius: 4px;
+            overflow: hidden;
+            margin: 0.5rem 0;
+        }
+
+        .progress-fill {
+            height: 100%;
+            background: linear-gradient(135deg, var(--primary) 0%, var(--accent) 100%);
+            transition: var(--transition);
+            width: 0%;
+        }
+
+        .progress-text {
+            font-size: 0.9rem;
+            color: var(--text-secondary);
+            font-weight: 600;
+        }
+
+        @media (max-width: 768px) {
+            body {
+                padding: 1rem;
+            }
+
+            .header {
+                padding: 1.5rem 1rem;
+            }
+
+            .header h1 {
+                font-size: 2rem;
+            }
+
+            .content {
+                padding: 1.5rem 1rem;
+            }
+
+            .professionals-grid {
+                grid-template-columns: 1fr;
+            }
+
+            .project-summary {
+                grid-template-columns: repeat(2, 1fr);
+            }
+
+            .months-allocation {
+                grid-template-columns: repeat(2, 1fr);
+            }
+
+            .totals-grid {
+                grid-template-columns: 1fr;
+            }
+
+            .month-tabs {
+                flex-wrap: wrap;
+            }
+        }
+    </style>
+</head>
+<body>
+    <a href="/dados_avulso" class="back-button">←</a>
+
+    <div class="container">
+        <div class="header">
+            <h1>⚡ Alocação de Horas</h1>
+            <p>Distribua as horas do projeto avulso entre profissionais e meses</p>
+        </div>
+
+        <div class="content">
+            <div class="project-summary">
+                <div class="summary-item">
+                    <div class="summary-value">{{ qtd }}</div>
+                    <div class="summary-label">Profissionais</div>
+                </div>
+                <div class="summary-item">
+                    <div class="summary-value">{{ meses }}</div>
+                    <div class="summary-label">Meses</div>
+                </div>
+                <div class="summary-item">
+                    <div class="summary-value" id="totalHorasAlocadas">0</div>
+                    <div class="summary-label">Horas Alocadas</div>
+                </div>
+                <div class="summary-item">
+                    <div class="summary-value" id="progressoPercent">0%</div>
+                    <div class="summary-label">Progresso</div>
+                </div>
+            </div>
+
+            <div class="progress-indicator">
+                <div class="progress-text" id="progressText">Configure os profissionais para começar</div>
+                <div class="progress-bar">
+                    <div class="progress-fill" id="progressFill"></div>
+                </div>
+            </div>
+
+            <form method="POST" action="/resultado" oninput="calcularTotais()" id="allocationForm">
+                <div class="professionals-grid">
+                    {% for i in range(qtd) %}
+                    <div class="professional-card" id="card_{{ i }}">
+                        <div class="card-header">
+                            <div class="card-number">{{ i+1 }}</div>
+                            <div class="card-title">Profissional {{ i+1 }}</div>
+                        </div>
+
+                        <select name="profissional_{{ i }}" id="profissional_{{ i }}" required onchange="atualizarDisponibilidade({{ i }})">
+                            <option value="" disabled selected>🔍 Selecione um profissional</option>
+                            {% for prof in profissionais %}
+                            <option value="{{ prof.nome }}">{{ prof.nome }} | {{ prof.nivel }} | R$ {{ prof.valor_hora }}/h</option>
+                            {% endfor %}
+                        </select>
+
+                        <div id="info_{{ i }}" class="professional-info">
+                            Selecione um profissional para ver as informações
+                        </div>
+
+                        <div class="months-allocation">
+                            {% for m in range(meses) %}
+                            <div class="month-input-group">
+                                <label class="month-label" for="mes_{{ i }}_{{ m }}">Mês {{ m+1 }}</label>
+                                <div class="availability-info" id="disponivel_{{ i }}_{{ m }}">— h disponíveis</div>
+                                <input type="number" class="month-input" name="mes_{{ i }}_{{ m }}"
+                                       id="mes_{{ i }}_{{ m }}" min="0" required
+                                       placeholder="0" oninput="validarLimiteMensal({{ i }}, {{ m }})">
+                            </div>
+                            {% endfor %}
+                        </div>
+                    </div>
+                    {% endfor %}
+                </div>
+
+                <div class="markup-section">
+                    <h3>💰 Configuração de Markup</h3>
+                    <div class="markup-input-group">
+                        <label for="markup">Markup:</label>
+                        <input type="number" id="markup" name="markup" min="0" max="500"
+                               placeholder="0" oninput="calcularTotais()">
+                        <span>%</span>
+                    </div>
+                </div>
+
+                <div class="totals-section">
+                    <div class="totals-grid">
+                        <div class="total-item">
+                            <div class="total-value" id="custoTotal">R$ 0,00</div>
+                            <div class="total-label">Custo Total</div>
+                        </div>
+                        <div class="total-item">
+                            <div class="total-value" id="markupValue">0%</div>
+                            <div class="total-label">Markup</div>
+                        </div>
+                        <div class="total-item">
+                            <div class="total-value" id="valorFinal">R$ 0,00</div>
+                            <div class="total-label">Valor Final</div>
+                        </div>
+                        <div class="total-item">
+                            <div class="total-value" id="lucroTotal">R$ 0,00</div>
+                            <div class="total-label">Lucro</div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="submit-section">
+                    <button type="submit" class="btn" id="submitBtn" disabled>
+                        🚀 Finalizar Cálculo de Rentabilidade
+                    </button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <script>
+        const profissionais = {{ profissionais|tojson }};
+        const qtd = {{ qtd }};
+        const meses = {{ meses }};
+
+        function atualizarDisponibilidade(i) {
+            const select = document.getElementById(`profissional_${i}`);
+            const info = document.getElementById(`info_${i}`);
+            const card = document.getElementById(`card_${i}`);
+            const prof = profissionais.find(p => p.nome === select.value);
+
+            if (prof) {
+                info.innerHTML = `
+                    <div class="professional-details">
+                        <div class="professional-name">${prof.nome}</div>
+                        <div class="professional-specs">
+                            <div class="spec-row">
+                                <span>Nível:</span>
+                                <strong>${prof.nivel}</strong>
+                            </div>
+                            <div class="spec-row">
+                                <span>Valor/hora:</span>
+                                <strong>R$ ${prof.valor_hora}</strong>
+                            </div>
+                        </div>
+                    </div>
+                `;
+                info.classList.add('filled');
+
+                // Atualizar disponibilidade para cada mês
+                for (let m = 0; m < meses; m++) {
+                    const span = document.getElementById(`disponivel_${i}_${m}`);
+                    const input = document.getElementById(`mes_${i}_${m}`);
+
+                    if (prof.horas_mensais && prof.horas_mensais[m] !== undefined) {
+                        const disponivel = prof.horas_mensais[m];
+                        span.textContent = `${disponivel}h disponíveis`;
+                        input.max = disponivel;
+                    } else {
+                        span.textContent = "∞ h disponíveis";
+                        input.removeAttribute("max");
+                    }
+                }
+            } else {
+                info.innerHTML = 'Selecione um profissional para ver as informações';
+                info.classList.remove('filled');
+
+                // Limpar disponibilidade
+                for (let m = 0; m < meses; m++) {
+                    document.getElementById(`disponivel_${i}_${m}`).textContent = "— h disponíveis";
+                }
+            }
+
+            calcularTotais();
+        }
+
+        function validarLimiteMensal(i, m) {
+            const select = document.getElementById(`profissional_${i}`);
+            const prof = profissionais.find(p => p.nome === select.value);
+            const input = document.getElementById(`mes_${i}_${m}`);
+            const valor = parseFloat(input.value || '0');
+
+            // Limpar classes anteriores
+            input.classList.remove('error', 'success');
+
+            if (prof && prof.horas_mensais && prof.horas_mensais[m] !== undefined) {
+                const max = prof.horas_mensais[m];
+
+                if (valor > max) {
+                    input.classList.add('error');
+                    input.setCustomValidity(`Máximo ${max}h disponíveis no mês ${m+1}`);
+                } else if (valor > 0) {
+                    input.classList.add('success');
+                    input.setCustomValidity('');
+                } else {
+                    input.setCustomValidity('');
+                }
+            } else if (valor > 0) {
+                input.classList.add('success');
+                input.setCustomValidity('');
+            } else {
+                input.setCustomValidity('');
+            }
+
+            calcularTotais();
+            atualizarProgresso();
+        }
+
+        function calcularTotais() {
+            let total = 0;
+            let totalHoras = 0;
+
+            for (let i = 0; i < qtd; i++) {
+                const select = document.getElementById(`profissional_${i}`);
+                if (!select?.value) continue;
+
+                const prof = profissionais.find(p => p.nome === select.value);
+                let somaHoras = 0;
+
+                for (let m = 0; m < meses; m++) {
+                    const horasInput = document.getElementById(`mes_${i}_${m}`);
+                    const horas = parseFloat(horasInput?.value || '0');
+                    somaHoras += horas;
+                }
+
+                if (prof && somaHoras > 0) {
+                    total += somaHoras * prof.valor_hora;
+                    totalHoras += somaHoras;
+                }
+            }
+
+            const markup = parseFloat(document.getElementById('markup')?.value || '0');
+            const valorFinal = total * (1 + markup/100);
+            const lucro = valorFinal - total;
+
+            // Atualizar displays
+            document.getElementById('custoTotal').textContent =
+                `R$ ${total.toLocaleString('pt-BR', {minimumFractionDigits:2})}`;
+            document.getElementById('markupValue').textContent = `${markup}%`;
+            document.getElementById('valorFinal').textContent =
+                `R$ ${valorFinal.toLocaleString('pt-BR', {minimumFractionDigits:2})}`;
+            document.getElementById('lucroTotal').textContent =
+                `R$ ${lucro.toLocaleString('pt-BR', {minimumFractionDigits:2})}`;
+            document.getElementById('totalHorasAlocadas').textContent = totalHoras;
+
+            validarFormulario();
+        }
+
+        function atualizarProgresso() {
+            let totalInputs = qtd * meses;
+            let inputsPreenchidos = 0;
+            let inputsValidos = 0;
+
+            for (let i = 0; i < qtd; i++) {
+                const select = document.getElementById(`profissional_${i}`);
+                if (select.value) {
+                    for (let m = 0; m < meses; m++) {
+                        const input = document.getElementById(`mes_${i}_${m}`);
+                        if (input.value && parseFloat(input.value) > 0) {
+                            inputsPreenchidos++;
+                            if (input.checkValidity()) {
+                                inputsValidos++;
+                            }
+                        }
+                    }
+                }
+            }
+
+            const progresso = (inputsValidos / totalInputs) * 100;
+            document.getElementById('progressoPercent').textContent = `${Math.round(progresso)}%`;
+            document.getElementById('progressFill').style.width = `${progresso}%`;
+
+            let progressText = '';
+            if (progresso === 0) {
+                progressText = 'Configure os profissionais para começar';
+            } else if (progresso < 50) {
+                progressText = 'Continue alocando as horas...';
+            } else if (progresso < 100) {
+                progressText = 'Quase terminando a alocação!';
+            } else {
+                progressText = 'Alocação completa - pronto para calcular!';
+            }
+
+            document.getElementById('progressText').textContent = progressText;
+        }
+
+        function validarFormulario() {
+            const submitBtn = document.getElementById('submitBtn');
+            let todosValidos = true;
+            let algumPreenchido = false;
+
+            for (let i = 0; i < qtd; i++) {
+                const select = document.getElementById(`profissional_${i}`);
+                if (select.value) {
+                    for (let m = 0; m < meses; m++) {
+                        const input = document.getElementById(`mes_${i}_${m}`);
+                        if (input.value && parseFloat(input.value) > 0) {
+                            algumPreenchido = true;
+                            if (!input.checkValidity()) {
+                                todosValidos = false;
+                            }
+                        }
+                    }
+                }
+            }
+
+            const isValid = todosValidos && algumPreenchido;
+            submitBtn.disabled = !isValid;
+
+            if (isValid) {
+                submitBtn.textContent = '🎯 Finalizar Cálculo de Rentabilidade';
+            } else {
+                submitBtn.textContent = '🚀 Finalizar Cálculo de Rentabilidade';
+            }
+        }
+
+        // Animações de entrada
+        document.addEventListener('DOMContentLoaded', function() {
+            const cards = document.querySelectorAll('.professional-card');
+            cards.forEach((card, index) => {
+                card.style.animationDelay = `${index * 0.1}s`;
+                card.style.animation = 'fadeInUp 0.6s ease forwards';
+            });
+
+            atualizarProgresso();
+        });
+
+        const style = document.createElement('style');
+        style.textContent = `
+            @keyframes fadeInUp {
+                from {
+                    opacity: 0;
+                    transform: translateY(30px);
+                }
+                to {
+                    opacity: 1;
+                    transform: translateY(0);
+                }
+            }
+        `;
+        document.head.appendChild(style);
+    </script>
+</body>
+</html>
