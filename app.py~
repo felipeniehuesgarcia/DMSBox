@@ -3,51 +3,9 @@ from datetime import datetime
 import json
 import os
 
-# Comentado temporariamente para evitar erro de Google Sheets
-# from google_sheets import GoogleSheetsReader
+from google_sheets import GoogleSheetsReader
 
 app = Flask(__name__)
-
-
-# Dados simulados para teste (substitua pela integração real quando resolver o Google Sheets)
-def get_mock_profissionais():
-    return [
-        {
-            "nome": "Ana Silva",
-            "nivel": "Senior",
-            "valor_hora": 85.0,
-            "horas_disponiveis": 160,
-            "horas_mensais": [160, 140, 180, 160, 150, 170]
-        },
-        {
-            "nome": "João Santos",
-            "nivel": "Pleno",
-            "valor_hora": 65.0,
-            "horas_disponiveis": 180,
-            "horas_mensais": [180, 160, 190, 180, 170, 180]
-        },
-        {
-            "nome": "Maria Costa",
-            "nivel": "Junior",
-            "valor_hora": 45.0,
-            "horas_disponiveis": 160,
-            "horas_mensais": [160, 150, 170, 160, 160, 160]
-        },
-        {
-            "nome": "Carlos Oliveira",
-            "nivel": "Senior",
-            "valor_hora": 90.0,
-            "horas_disponiveis": 140,
-            "horas_mensais": [140, 120, 150, 140, 130, 140]
-        },
-        {
-            "nome": "Fernanda Lima",
-            "nivel": "Pleno",
-            "valor_hora": 70.0,
-            "horas_disponiveis": 170,
-            "horas_mensais": [170, 160, 180, 170, 160, 170]
-        }
-    ]
 
 
 # Rota principal - página inicial modernizada
@@ -62,14 +20,9 @@ def dados_recorrente():
         quantidade = int(request.form['quantidade'])
         inicio = request.form['inicio']
         vigencia = request.form['vigencia']
-
-        # Usando dados simulados temporariamente
-        profissionais_disponiveis = get_mock_profissionais()
-
-        # Quando resolver o Google Sheets, descomente a linha abaixo:
-        # profissionais_disponiveis = GoogleSheetsReader().profissionais_disponiveis_recorrente(
-        #     datetime.strptime(inicio, "%Y-%m-%d"), int(vigencia)
-        # )
+        profissionais_disponiveis = GoogleSheetsReader().profissionais_disponiveis_recorrente(
+            datetime.strptime(inicio, "%Y-%m-%d"), int(vigencia)
+        )
 
         return render_template('selecionar.html',
                                quantidade=quantidade,
@@ -89,13 +42,8 @@ def dados_avulso():
         # Calcula meses entre contrato e prazo
         inicio = datetime.strptime(data_contrato, "%Y-%m-%d")
         fim = datetime.strptime(prazo, "%Y-%m-%d")
+        profissionais_disponiveis = GoogleSheetsReader().profissionais_disponiveis_avulso(inicio, fim)
         total_meses = (fim.year - inicio.year) * 12 + fim.month - inicio.month + 1
-
-        # Usando dados simulados temporariamente
-        profissionais_disponiveis = get_mock_profissionais()
-
-        # Quando resolver o Google Sheets, descomente as linhas abaixo:
-        # profissionais_disponiveis = GoogleSheetsReader().profissionais_disponiveis_avulso(inicio, fim)
 
         return render_template('alocar_avulso.html',
                                profissionais=profissionais_disponiveis,
@@ -104,15 +52,12 @@ def dados_avulso():
     return render_template('dados_avulso.html')
 
 
-# Rota para processar resultados
+# Rota para processar resultados (ainda precisa ser implementada)
 @app.route('/resultado', methods=['POST'])
 def resultado():
-    # Processar os dados do formulário e calcular os resultados
-    form_data = dict(request.form)
-
-    # Aqui você pode implementar a lógica de cálculo
-    # Por enquanto, retorna uma página de resultado com os dados do formulário
-    return render_template('resultado.html', dados=form_data)
+    # Aqui você processará os dados do formulário e calculará os resultados
+    # Por enquanto, vou retornar uma página de resultado básica
+    return render_template('resultado.html', dados=request.form)
 
 
 # Rota para servir os dados dos gráficos

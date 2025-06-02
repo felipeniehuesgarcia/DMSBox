@@ -1,10 +1,362 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="pt-br">
 <head>
-  <meta charset="UTF-8">
-  <title>$Title$</title>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Dashboard Inteligente</title>
+    <script src="https://cdn.plot.ly/plotly-latest.min.js"></script>
+    <style>
+        :root {
+            --primary: #667eea;
+            --secondary: #764ba2;
+            --bg: #f8fafc;
+            --text-primary: #1a202c;
+            --text-secondary: #718096;
+            --radius: 16px;
+            --shadow: 0 10px 25px rgba(0,0,0,0.05);
+        }
+
+        body {
+            margin: 0;
+            font-family: 'Inter', sans-serif;
+            background: var(--bg);
+            display: flex;
+        }
+
+        .sidebar {
+            width: 200px;
+            background: white;
+            border-right: 1px solid #e2e8f0;
+            padding: 1.5rem 1rem;
+            box-shadow: var(--shadow);
+            height: 100vh;
+            position: fixed;
+        }
+
+        .sidebar h2 {
+            font-size: 1.1rem;
+            margin-bottom: 1.5rem;
+            text-align: center;
+        }
+
+        .nav-link {
+            display: block;
+            padding: 0.6rem;
+            border-radius: 8px;
+            text-decoration: none;
+            color: var(--text-secondary);
+            font-weight: 600;
+            margin-bottom: 0.8rem;
+            transition: background 0.3s;
+            cursor: pointer;
+            font-size: 0.9rem;
+        }
+
+        .nav-link.active {
+            background: linear-gradient(135deg, var(--primary), var(--secondary));
+            color: white;
+        }
+
+        .nav-link:hover:not(.active) {
+            background: rgba(102, 126, 234, 0.1);
+            color: var(--primary);
+        }
+
+        .back-button {
+            display: block;
+            padding: 0.6rem;
+            border-radius: 8px;
+            text-decoration: none;
+            color: var(--text-secondary);
+            font-weight: 600;
+            margin-bottom: 1rem;
+            transition: background 0.3s;
+            text-align: center;
+            background: #f8fafc;
+            border: 1px solid #e2e8f0;
+        }
+
+        .back-button:hover {
+            background: var(--primary);
+            color: white;
+        }
+
+        .main {
+            margin-left: 220px;
+            padding: 1rem;
+            flex: 1;
+        }
+
+        .graph-area {
+            display: none;
+            grid-template-columns: 1fr 1fr;
+            gap: 1rem;
+            flex-wrap: wrap;
+        }
+
+        .graph-area.active {
+            display: grid;
+        }
+
+        .graph {
+            background: white;
+            border-radius: 12px;
+            padding: 1rem;
+            box-shadow: var(--shadow);
+            min-height: 320px;
+        }
+
+        .graph-title {
+            font-weight: 700;
+            font-size: 1rem;
+            margin-bottom: 1rem;
+            text-align: center;
+            color: var(--text-primary);
+            border-bottom: 2px solid #e2e8f0;
+            padding-bottom: 0.5rem;
+        }
+
+        .graph-content {
+            height: 280px;
+        }
+
+        /* Layout específico para operacional */
+        #operacional.active {
+            grid-template-rows: auto auto;
+        }
+
+        #operacional .graph:first-child {
+            grid-column: span 2;
+        }
+
+        /* Layout específico para comercial */
+        #comercial.active {
+            grid-template-rows: auto auto;
+        }
+
+        #comercial .graph:first-child {
+            grid-column: span 2;
+        }
+
+        @media (max-width: 1200px) {
+            .graph-area {
+                grid-template-columns: 1fr;
+            }
+
+            #operacional .graph:first-child,
+            #comercial .graph:first-child {
+                grid-column: span 1;
+            }
+
+            .main {
+                padding: 0.5rem;
+            }
+        }
+
+        @media (max-width: 768px) {
+            .sidebar {
+                display: none;
+            }
+            body {
+                display: block;
+            }
+            .main {
+                margin-left: 0;
+                padding: 0.5rem;
+            }
+        }
+
+        .stats-summary {
+            background: white;
+            border-radius: 12px;
+            padding: 1.5rem;
+            margin-bottom: 1.5rem;
+            box-shadow: var(--shadow);
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 1.5rem;
+            text-align: center;
+        }
+
+        .stat-item {
+            padding: 1rem;
+            border-radius: 8px;
+            background: linear-gradient(135deg, #f8fafc 0%, #e8f2ff 100%);
+        }
+
+        .stat-number {
+            font-size: 1.8rem;
+            font-weight: 800;
+            color: var(--primary);
+            margin-bottom: 0.5rem;
+        }
+
+        .stat-label {
+            color: var(--text-secondary);
+            font-size: 0.9rem;
+            font-weight: 500;
+        }
+    </style>
 </head>
 <body>
-$END$
+    <div class="sidebar">
+        <a href="/" class="back-button">← Voltar</a>
+        <h2>📊 Dashboards</h2>
+        <div class="nav-link active" data-category="operacional">🧑‍💻 Operacional</div>
+        <div class="nav-link" data-category="financeiro">💰 Financeiro</div>
+        <div class="nav-link" data-category="comercial">📈 Comercial</div>
+    </div>
+
+    <div class="main">
+        <div class="stats-summary">
+            <div class="stat-item">
+                <div class="stat-number">42</div>
+                <div class="stat-label">Projetos Calculados</div>
+            </div>
+            <div class="stat-item">
+                <div class="stat-number">R$ 2.5M</div>
+                <div class="stat-label">Valor Total</div>
+            </div>
+            <div class="stat-item">
+                <div class="stat-number">23%</div>
+                <div class="stat-label">Margem Média</div>
+            </div>
+            <div class="stat-item">
+                <div class="stat-number">3.2K</div>
+                <div class="stat-label">Horas Alocadas</div>
+            </div>
+        </div>
+
+        <div id="operacional" class="graph-area active">
+            <div class="graph">
+                <div class="graph-title">Horas Alocadas por Projeto</div>
+                <div class="graph-content" id="g_op_2"></div>
+            </div>
+            <div class="graph">
+                <div class="graph-title">Funcionários com Maior Carga de Trabalho</div>
+                <div class="graph-content" id="g_op_1"></div>
+            </div>
+            <div class="graph">
+                <div class="graph-title">Distribuição de Tipos de Tarefa</div>
+                <div class="graph-content" id="g_op_0"></div>
+            </div>
+        </div>
+
+        <div id="financeiro" class="graph-area">
+            <div class="graph">
+                <div class="graph-title">Faturamento Mensal</div>
+                <div class="graph-content" id="g_fin_0"></div>
+            </div>
+            <div class="graph">
+                <div class="graph-title">Lucro por Projeto</div>
+                <div class="graph-content" id="g_fin_2"></div>
+            </div>
+            <div class="graph">
+                <div class="graph-title">Proporção de Custos Operacionais</div>
+                <div class="graph-content" id="g_fin_3"></div>
+            </div>
+            <div class="graph">
+                <div class="graph-title">Evolução do Ticket Médio</div>
+                <div class="graph-content" id="g_fin_1"></div>
+            </div>
+        </div>
+
+        <div id="comercial" class="graph-area">
+            <div class="graph">
+                <div class="graph-title">Número de Novos Clientes por Mês</div>
+                <div class="graph-content" id=""></div>
+            </div>
+            <div class="graph">
+                <div class="graph-title">Tempo Médio de Retenção de Clientes</div>
+                <div class="graph-content" id="g_com_1"></div>
+            </div>
+            <div class="graph">
+                <div class="graph-title">Distribuição Geográfica dos Clientes</div>
+                <div class="graph-content" id="g_com_0"></div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        let categorias = {};
+
+        // Carregar dados do dashboard
+        fetch('/api/dashboard-data')
+            .then(r => r.json())
+            .then(data => {
+                Object.assign(categorias, data);
+                renderGraficos('operacional');
+            })
+            .catch(error => {
+                console.error('Erro ao carregar dados:', error);
+            });
+
+        function renderGraficos(cat) {
+            const areas = document.querySelectorAll('.graph-area');
+            areas.forEach(a => a.classList.remove('active'));
+            document.getElementById(cat).classList.add('active');
+
+            let prefix = cat === "operacional" ? "g_op_" :
+                         cat === "financeiro" ? "g_fin_" :
+                         "g_com_";
+
+            if (categorias[cat]) {
+                Object.values(categorias[cat]).forEach((grafico, i) => {
+                    const elementId = `${prefix}${i}`;
+                    const element = document.getElementById(elementId);
+
+                    if (element && grafico && grafico[0]) {
+                        const layout = {
+                            margin: { t: 20, r: 30, b: 50, l: 50 },
+                            paper_bgcolor: 'rgba(0,0,0,0)',
+                            plot_bgcolor: 'rgba(0,0,0,0)',
+                            font: {
+                                family: 'Inter, sans-serif',
+                                size: 12,
+                                color: '#1a202c'
+                            },
+                            showlegend: grafico[0].type === 'pie',
+                            responsive: true,
+                            autosize: true
+                        };
+
+                        // Configurações específicas para gráficos de pizza
+                        if (grafico[0].type === 'pie') {
+                            layout.legend = {
+                                orientation: "v",
+                                x: 1.02,
+                                y: 0.5,
+                                font: { size: 10 }
+                            };
+                        }
+
+                        // Configurações para gráficos de barras/linhas
+                        if (grafico[0].type === 'bar' || grafico[0].type === 'line') {
+                            layout.xaxis = {
+                                tickangle: -45,
+                                tickfont: { size: 10 }
+                            };
+                            layout.yaxis = {
+                                tickfont: { size: 10 }
+                            };
+                        }
+
+                        Plotly.newPlot(elementId, [grafico[0]], layout, {
+                            responsive: true,
+                            displayModeBar: false
+                        });
+                    }
+                });
+            }
+        }
+
+        document.querySelectorAll('.nav-link').forEach(link => {
+            link.addEventListener('click', () => {
+                document.querySelectorAll('.nav-link').forEach(l => l.classList.remove('active'));
+                link.classList.add('active');
+                renderGraficos(link.dataset.category);
+            });
+        });
+    </script>
 </body>
 </html>
