@@ -363,6 +363,126 @@
             font-size: 1.1rem;
         }
 
+        .dashboard-sidebar h3 {
+            font-size: 1rem;
+            margin-bottom: 1rem;
+            text-align: center;
+            color: var(--text-primary);
+        }
+
+        .dashboard-nav-link {
+            display: block;
+            padding: 0.6rem 0.8rem;
+            border-radius: 6px;
+            text-decoration: none;
+            color: var(--text-secondary);
+            font-weight: 600;
+            font-size: 0.85rem;
+            margin-bottom: 0.4rem;
+            transition: var(--transition);
+            cursor: pointer;
+            border: none;
+            background: none;
+            width: 100%;
+            text-align: left;
+        }
+
+        .dashboard-nav-link:hover {
+            background: rgba(102, 126, 234, 0.1);
+            color: var(--primary);
+        }
+
+        .dashboard-nav-link.active {
+            background: linear-gradient(135deg, var(--primary), var(--secondary));
+            color: white;
+        }
+
+        .dashboard-main {
+            flex: 1;
+            background: var(--surface);
+            border-radius: 12px;
+            padding: 1rem;
+            box-shadow: var(--shadow);
+            border: 1px solid var(--border);
+            overflow: auto;
+        }
+
+        .graph-area {
+            display: none;
+            gap: 1rem;
+            height: 100%;
+        }
+
+        .graph-area.active {
+            display: flex;
+            flex-direction: column;
+        }
+
+        /* Layout específico para cada categoria */
+        #operacional.active {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            grid-template-rows: 1fr 1fr;
+            gap: 1rem;
+        }
+
+        #operacional .graph:first-child {
+            grid-column: span 2;
+        }
+
+        #financeiro.active {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            grid-template-rows: 1fr 1fr;
+            gap: 1rem;
+        }
+
+        #comercial.active {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            grid-template-rows: 1fr 1fr;
+            gap: 1rem;
+        }
+
+        #comercial .graph:first-child {
+            grid-column: span 2;
+        }
+
+        .graph {
+            background: var(--surface);
+            border-radius: 12px;
+            padding: 1rem;
+            box-shadow: var(--shadow);
+            border: 1px solid var(--border);
+            min-height: 300px;
+            display: flex;
+            flex-direction: column;
+        }
+
+        .graph-title {
+            font-weight: 700;
+            font-size: 1.1rem;
+            margin-bottom: 1rem;
+            color: var(--text-primary);
+            text-align: center;
+            padding-bottom: 0.5rem;
+            border-bottom: 2px solid var(--border);
+        }
+
+        .graph-content {
+            flex: 1;
+            min-height: 240px;
+        }
+
+        .dashboard-loading {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            height: 400px;
+            color: var(--text-secondary);
+            font-size: 1.1rem;
+        }
+
         @media (max-width: 1200px) {
             #operacional.active,
             #financeiro.active,
@@ -483,22 +603,68 @@
             </div>
 
             <div id="dashboard" class="tab-content">
-                <div style="text-align: center; padding: 4rem 2rem;">
-                    <h2 style="font-size: 2rem; margin-bottom: 1rem; color: var(--text-primary);">📈 Dashboard Analítico</h2>
-                    <p style="font-size: 1.1rem; margin-bottom: 2rem; color: var(--text-secondary);">Visualize métricas importantes e insights dos seus projetos em uma experiência completa</p>
-
-                    <div style="background: linear-gradient(135deg, rgba(102, 126, 234, 0.05) 0%, rgba(248, 250, 252, 1) 100%); border: 1px solid rgba(102, 126, 234, 0.2); border-radius: 12px; padding: 2rem; margin: 2rem auto; max-width: 600px;">
-                        <h3 style="margin-bottom: 1rem; color: var(--text-primary);">🎯 Dashboards Disponíveis</h3>
-                        <div style="text-align: left; margin: 1rem 0;">
-                            <div style="margin-bottom: 0.8rem;"><strong>🧑‍💻 Operacional:</strong> Horas alocadas, carga de trabalho e distribuição de tarefas</div>
-                            <div style="margin-bottom: 0.8rem;"><strong>💰 Financeiro:</strong> Faturamento, lucros, custos e ticket médio</div>
-                            <div style="margin-bottom: 0.8rem;"><strong>📈 Comercial:</strong> Novos clientes, retenção e distribuição geográfica</div>
-                        </div>
+                <div class="dashboard-container">
+                    <div class="dashboard-sidebar">
+                        <h3>📊 Dashboards</h3>
+                        <button class="dashboard-nav-link active" data-category="operacional">🧑‍💻 Operacional</button>
+                        <button class="dashboard-nav-link" data-category="financeiro">💰 Financeiro</button>
+                        <button class="dashboard-nav-link" data-category="comercial">📈 Comercial</button>
                     </div>
 
-                    <a href="/dashboard" class="btn" style="font-size: 1.1rem; padding: 1rem 2rem;">
-                        🚀 Acessar Dashboard Completo
-                    </a>
+                    <div class="dashboard-main">
+                        <div id="loading" class="dashboard-loading">
+                            Carregando dashboards...
+                        </div>
+
+                        <div id="operacional" class="graph-area">
+                            <div class="graph">
+                                <div class="graph-title">Horas Alocadas por Projeto</div>
+                                <div class="graph-content" id="g_op_0"></div>
+                            </div>
+                            <div class="graph">
+                                <div class="graph-title">Funcionários com Maior Carga de Trabalho</div>
+                                <div class="graph-content" id="g_op_1"></div>
+                            </div>
+                            <div class="graph">
+                                <div class="graph-title">Distribuição de Tipos de Tarefa</div>
+                                <div class="graph-content" id="g_op_2"></div>
+                            </div>
+                        </div>
+
+                        <div id="financeiro" class="graph-area">
+                            <div class="graph">
+                                <div class="graph-title">Faturamento Mensal</div>
+                                <div class="graph-content" id="g_fin_0"></div>
+                            </div>
+                            <div class="graph">
+                                <div class="graph-title">Evolução do Ticket Médio</div>
+                                <div class="graph-content" id="g_fin_1"></div>
+                            </div>
+                            <div class="graph">
+                                <div class="graph-title">Lucro por Projeto</div>
+                                <div class="graph-content" id="g_fin_2"></div>
+                            </div>
+                            <div class="graph">
+                                <div class="graph-title">Proporção de Custos Operacionais</div>
+                                <div class="graph-content" id="g_fin_3"></div>
+                            </div>
+                        </div>
+
+                        <div id="comercial" class="graph-area">
+                            <div class="graph">
+                                <div class="graph-title">Distribuição Geográfica dos Clientes</div>
+                                <div class="graph-content" id="g_com_0"></div>
+                            </div>
+                            <div class="graph">
+                                <div class="graph-title">Número de Novos Clientes por Mês</div>
+                                <div class="graph-content" id="g_com_1"></div>
+                            </div>
+                            <div class="graph">
+                                <div class="graph-title">Tempo Médio de Retenção de Clientes</div>
+                                <div class="graph-content" id="g_com_2"></div>
+                            </div>
+                        </div>
+                    </div>
                 </div>
             </div>
         </div>
