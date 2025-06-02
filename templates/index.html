@@ -4,6 +4,7 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Sistema de Rentabilidade</title>
+    <script src="https://cdn.plot.ly/plotly-latest.min.js"></script>
     <style>
         :root {
             --primary: #667eea;
@@ -186,6 +187,11 @@
             justify-content: center;
             margin-bottom: 1.5rem;
             font-size: 1.5rem;
+            transition: var(--transition);
+        }
+
+        .feature-card:hover .feature-icon {
+            transform: scale(1.1) rotate(5deg);
         }
 
         .feature-card h3 {
@@ -219,55 +225,304 @@
             box-shadow: 0 8px 20px rgba(102, 126, 234, 0.3);
         }
 
-        .dashboard-placeholder {
-            text-align: center;
-            padding: 4rem 2rem;
-            color: var(--text-secondary);
+        /* Dashboard Styles */
+        .dashboard-container {
+            display: flex;
+            gap: 1rem;
+            height: 80vh;
+            min-height: 700px;
         }
 
-        .dashboard-placeholder h2 {
-            font-size: 2rem;
+        .dashboard-sidebar {
+            width: 180px;
+            background: var(--surface);
+            border-radius: 12px;
+            padding: 1rem;
+            box-shadow: var(--shadow);
+            border: 1px solid var(--border);
+            flex-shrink: 0;
+        }
+
+        .dashboard-sidebar h3 {
+            font-size: 1rem;
             margin-bottom: 1rem;
+            text-align: center;
             color: var(--text-primary);
         }
 
-        .dashboard-placeholder p {
-            font-size: 1.1rem;
-            margin-bottom: 2rem;
-        }
-
-        .stats-grid {
-            display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
-            gap: 1.5rem;
-            margin-top: 2rem;
-        }
-
-        .stat-card {
-            background: var(--surface);
-            padding: 1.5rem;
-            border-radius: 12px;
-            border: 1px solid var(--border);
-            text-align: center;
-            transition: var(--transition);
-        }
-
-        .stat-card:hover {
-            transform: translateY(-3px);
-            box-shadow: var(--shadow);
-        }
-
-        .stat-number {
-            font-size: 2rem;
-            font-weight: 800;
-            color: var(--primary);
-            margin-bottom: 0.5rem;
-        }
-
-        .stat-label {
+        .dashboard-nav-link {
+            display: block;
+            padding: 0.6rem 0.8rem;
+            border-radius: 6px;
+            text-decoration: none;
             color: var(--text-secondary);
-            font-size: 0.9rem;
-            font-weight: 500;
+            font-weight: 600;
+            font-size: 0.85rem;
+            margin-bottom: 0.4rem;
+            transition: var(--transition);
+            cursor: pointer;
+            border: none;
+            background: none;
+            width: 100%;
+            text-align: left;
+        }
+
+        .dashboard-nav-link:hover {
+            background: rgba(102, 126, 234, 0.1);
+            color: var(--primary);
+        }
+
+        .dashboard-nav-link.active {
+            background: linear-gradient(135deg, var(--primary), var(--secondary));
+            color: white;
+        }
+
+        .dashboard-main {
+            flex: 1;
+            background: var(--surface);
+            border-radius: 12px;
+            padding: 1rem;
+            box-shadow: var(--shadow);
+            border: 1px solid var(--border);
+            overflow: auto;
+        }
+
+        .graph-area {
+            display: none;
+            gap: 1rem;
+            height: 100%;
+        }
+
+        .graph-area.active {
+            display: flex;
+            flex-direction: column;
+        }
+
+        /* Layout específico para cada categoria */
+        #operacional.active {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            grid-template-rows: 1fr 1fr;
+            gap: 1rem;
+        }
+
+        #operacional .graph:first-child {
+            grid-column: span 2;
+        }
+
+        #financeiro.active {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            grid-template-rows: 1fr 1fr;
+            gap: 1rem;
+        }
+
+        #comercial.active {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            grid-template-rows: 1fr 1fr;
+            gap: 1rem;
+        }
+
+        #comercial .graph:first-child {
+            grid-column: span 2;
+        }
+
+        .graph {
+            background: var(--surface);
+            border-radius: 12px;
+            padding: 1rem;
+            box-shadow: var(--shadow);
+            border: 1px solid var(--border);
+            min-height: 300px;
+            display: flex;
+            flex-direction: column;
+        }
+
+        .graph-title {
+            font-weight: 700;
+            font-size: 1.1rem;
+            margin-bottom: 1rem;
+            color: var(--text-primary);
+            text-align: center;
+            padding-bottom: 0.5rem;
+            border-bottom: 2px solid var(--border);
+        }
+
+        .graph-content {
+            flex: 1;
+            min-height: 240px;
+        }
+
+        .dashboard-loading {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            height: 400px;
+            color: var(--text-secondary);
+            font-size: 1.1rem;
+        }
+
+        .dashboard-sidebar h3 {
+            font-size: 1rem;
+            margin-bottom: 1rem;
+            text-align: center;
+            color: var(--text-primary);
+        }
+
+        .dashboard-nav-link {
+            display: block;
+            padding: 0.6rem 0.8rem;
+            border-radius: 6px;
+            text-decoration: none;
+            color: var(--text-secondary);
+            font-weight: 600;
+            font-size: 0.85rem;
+            margin-bottom: 0.4rem;
+            transition: var(--transition);
+            cursor: pointer;
+            border: none;
+            background: none;
+            width: 100%;
+            text-align: left;
+        }
+
+        .dashboard-nav-link:hover {
+            background: rgba(102, 126, 234, 0.1);
+            color: var(--primary);
+        }
+
+        .dashboard-nav-link.active {
+            background: linear-gradient(135deg, var(--primary), var(--secondary));
+            color: white;
+        }
+
+        .dashboard-main {
+            flex: 1;
+            background: var(--surface);
+            border-radius: 12px;
+            padding: 1rem;
+            box-shadow: var(--shadow);
+            border: 1px solid var(--border);
+            overflow: auto;
+        }
+
+        .graph-area {
+            display: none;
+            gap: 1rem;
+            height: 100%;
+        }
+
+        .graph-area.active {
+            display: flex;
+            flex-direction: column;
+        }
+
+        /* Layout específico para cada categoria */
+        #operacional.active {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            grid-template-rows: 1fr 1fr;
+            gap: 1rem;
+        }
+
+        #operacional .graph:first-child {
+            grid-column: span 2;
+        }
+
+        #financeiro.active {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            grid-template-rows: 1fr 1fr;
+            gap: 1rem;
+        }
+
+        #comercial.active {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            grid-template-rows: 1fr 1fr;
+            gap: 1rem;
+        }
+
+        #comercial .graph:first-child {
+            grid-column: span 2;
+        }
+
+        .graph {
+            background: var(--surface);
+            border-radius: 12px;
+            padding: 1rem;
+            box-shadow: var(--shadow);
+            border: 1px solid var(--border);
+            min-height: 300px;
+            display: flex;
+            flex-direction: column;
+        }
+
+        .graph-title {
+            font-weight: 700;
+            font-size: 1.1rem;
+            margin-bottom: 1rem;
+            color: var(--text-primary);
+            text-align: center;
+            padding-bottom: 0.5rem;
+            border-bottom: 2px solid var(--border);
+        }
+
+        .graph-content {
+            flex: 1;
+            min-height: 240px;
+        }
+
+        .dashboard-loading {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            height: 400px;
+            color: var(--text-secondary);
+            font-size: 1.1rem;
+        }
+
+        @media (max-width: 1200px) {
+            #operacional.active,
+            #financeiro.active,
+            #comercial.active {
+                grid-template-columns: 1fr;
+                grid-template-rows: auto;
+            }
+
+            #operacional .graph:first-child,
+            #comercial .graph:first-child {
+                grid-column: span 1;
+            }
+
+            .dashboard-container {
+                flex-direction: column;
+                height: auto;
+            }
+
+            .dashboard-sidebar {
+                width: 100%;
+                display: flex;
+                flex-direction: row;
+                gap: 0.5rem;
+                align-items: center;
+                padding: 0.8rem;
+            }
+
+            .dashboard-sidebar h3 {
+                margin: 0;
+                flex-shrink: 0;
+                font-size: 0.9rem;
+            }
+
+            .dashboard-nav-link {
+                margin: 0;
+                flex: 1;
+                text-align: center;
+                font-size: 0.8rem;
+                padding: 0.5rem;
+            }
         }
 
         @media (max-width: 768px) {
@@ -294,6 +549,20 @@
             .feature-grid {
                 grid-template-columns: 1fr;
                 max-width: 100%;
+            }
+
+            .dashboard-sidebar {
+                flex-direction: column;
+                padding: 1rem;
+            }
+
+            .dashboard-main {
+                padding: 1rem;
+            }
+
+            .graph {
+                min-height: 250px;
+                padding: 1rem;
             }
         }
     </style>
@@ -334,38 +603,67 @@
             </div>
 
             <div id="dashboard" class="tab-content">
-                <div class="dashboard-placeholder">
-                    <h2>Dashboard Analítico</h2>
-                    <p>Visualize métricas importantes e insights dos seus projetos</p>
-
-                    <div class="stats-grid">
-                        <div class="stat-card">
-                            <div class="stat-number">42</div>
-                            <div class="stat-label">Projetos Calculados</div>
-                        </div>
-                        <div class="stat-card">
-                            <div class="stat-number">R$ 2.5M</div>
-                            <div class="stat-label">Valor Total</div>
-                        </div>
-                        <div class="stat-card">
-                            <div class="stat-number">23%</div>
-                            <div class="stat-label">Margem Média</div>
-                        </div>
-                        <div class="stat-card">
-                            <div class="stat-number">156</div>
-                            <div class="stat-label">Horas Alocadas</div>
-                        </div>
+                <div class="dashboard-container">
+                    <div class="dashboard-sidebar">
+                        <h3>📊 Dashboards</h3>
+                        <button class="dashboard-nav-link active" data-category="operacional">🧑‍💻 Operacional</button>
+                        <button class="dashboard-nav-link" data-category="financeiro">💰 Financeiro</button>
+                        <button class="dashboard-nav-link" data-category="comercial">📈 Comercial</button>
                     </div>
 
-                    <div style="margin-top: 3rem; padding: 2rem; background: var(--surface); border-radius: 12px; border: 2px dashed var(--border);">
-                        <h3 style="margin-bottom: 1rem;">📈 Gráficos em Desenvolvimento</h3>
-                        <p>Aqui serão exibidos gráficos interativos com:</p>
-                        <ul style="text-align: left; margin: 1rem 0; max-width: 400px; margin-left: auto; margin-right: auto;">
-                            <li>Evolução da rentabilidade ao longo do tempo</li>
-                            <li>Comparativo de custos por profissional</li>
-                            <li>Distribuição de projetos por tipo</li>
-                            <li>Análise de utilização de recursos</li>
-                        </ul>
+                    <div class="dashboard-main">
+                        <div id="loading" class="dashboard-loading">
+                            Carregando dashboards...
+                        </div>
+
+                        <div id="operacional" class="graph-area">
+                            <div class="graph">
+                                <div class="graph-title">Horas Alocadas por Projeto</div>
+                                <div class="graph-content" id="g_op_0"></div>
+                            </div>
+                            <div class="graph">
+                                <div class="graph-title">Funcionários com Maior Carga de Trabalho</div>
+                                <div class="graph-content" id="g_op_1"></div>
+                            </div>
+                            <div class="graph">
+                                <div class="graph-title">Distribuição de Tipos de Tarefa</div>
+                                <div class="graph-content" id="g_op_2"></div>
+                            </div>
+                        </div>
+
+                        <div id="financeiro" class="graph-area">
+                            <div class="graph">
+                                <div class="graph-title">Faturamento Mensal por Cliente</div>
+                                <div class="graph-content" id="g_fin_0"></div>
+                            </div>
+                            <div class="graph">
+                                <div class="graph-title">Lucro por Projeto</div>
+                                <div class="graph-content" id="g_fin_1"></div>
+                            </div>
+                            <div class="graph">
+                                <div class="graph-title">Proporção de Custos Operacionais</div>
+                                <div class="graph-content" id="g_fin_2"></div>
+                            </div>
+                            <div class="graph">
+                                <div class="graph-title">Evolução do Ticket Médio</div>
+                                <div class="graph-content" id="g_fin_3"></div>
+                            </div>
+                        </div>
+
+                        <div id="comercial" class="graph-area">
+                            <div class="graph">
+                                <div class="graph-title">Número de Novos Clientes por Mês</div>
+                                <div class="graph-content" id="g_com_0"></div>
+                            </div>
+                            <div class="graph">
+                                <div class="graph-title">Tempo Médio de Retenção de Clientes</div>
+                                <div class="graph-content" id="g_com_1"></div>
+                            </div>
+                            <div class="graph">
+                                <div class="graph-title">Distribuição Geográfica dos Clientes</div>
+                                <div class="graph-content" id="g_com_2"></div>
+                            </div>
+                        </div>
                     </div>
                 </div>
             </div>
@@ -373,6 +671,8 @@
     </div>
 
     <script>
+        let dashboardData = null;
+
         function switchTab(tabName) {
             // Remover classe active de todas as abas
             document.querySelectorAll('.tab').forEach(tab => tab.classList.remove('active'));
@@ -381,9 +681,106 @@
             // Adicionar classe active na aba clicada
             event.target.classList.add('active');
             document.getElementById(tabName).classList.add('active');
+
+            // Carregar dados do dashboard se necessário
+            if (tabName === 'dashboard' && !dashboardData) {
+                loadDashboardData();
+            }
         }
 
-        // Adicionar animações suaves ao carregar
+        function loadDashboardData() {
+            fetch('/api/dashboard-data')
+                .then(response => response.json())
+                .then(data => {
+                    dashboardData = data;
+                    document.getElementById('loading').style.display = 'none';
+                    renderGraficos('operacional');
+                })
+                .catch(error => {
+                    console.error('Erro ao carregar dados:', error);
+                    document.getElementById('loading').innerHTML = 'Erro ao carregar dados do dashboard';
+                });
+        }
+
+        function renderGraficos(categoria) {
+            // Esconder todas as áreas de gráfico
+            const areas = document.querySelectorAll('.graph-area');
+            areas.forEach(area => area.classList.remove('active'));
+
+            // Mostrar área da categoria selecionada
+            document.getElementById(categoria).classList.add('active');
+
+            if (!dashboardData || !dashboardData[categoria]) return;
+
+            // Determinar prefixo baseado na categoria
+            let prefix = categoria === "operacional" ? "g_op_" :
+                        categoria === "financeiro" ? "g_fin_" :
+                        "g_com_";
+
+            // Renderizar gráficos da categoria
+            const graficos = Object.values(dashboardData[categoria]);
+            graficos.forEach((grafico, index) => {
+                const elementId = `${prefix}${index}`;
+                const element = document.getElementById(elementId);
+
+                if (element && grafico && grafico[0]) {
+                    // Configuração responsiva para melhor legibilidade
+                    const layout = {
+                        margin: { t: 30, r: 30, b: 50, l: 50 },
+                        paper_bgcolor: 'rgba(0,0,0,0)',
+                        plot_bgcolor: 'rgba(0,0,0,0)',
+                        font: {
+                            family: 'Inter, sans-serif',
+                            size: 13,
+                            color: '#1a202c'
+                        },
+                        showlegend: grafico[0].type === 'pie',
+                        responsive: true,
+                        autosize: true
+                    };
+
+                    // Configurações específicas para gráficos de pizza
+                    if (grafico[0].type === 'pie') {
+                        layout.legend = {
+                            orientation: "v",
+                            x: 1.02,
+                            y: 0.5,
+                            font: { size: 11 }
+                        };
+                    }
+
+                    // Configurações para gráficos de barras/linhas
+                    if (grafico[0].type === 'bar' || grafico[0].type === 'line') {
+                        layout.xaxis = {
+                            tickangle: -45,
+                            tickfont: { size: 10 }
+                        };
+                        layout.yaxis = {
+                            tickfont: { size: 10 }
+                        };
+                    }
+
+                    Plotly.newPlot(elementId, [grafico[0]], layout, {
+                        responsive: true,
+                        displayModeBar: false
+                    });
+                }
+            });
+        }
+
+        // Event listeners para navegação do dashboard
+        document.querySelectorAll('.dashboard-nav-link').forEach(link => {
+            link.addEventListener('click', function() {
+                // Remover classe active de todos os links
+                document.querySelectorAll('.dashboard-nav-link').forEach(l => l.classList.remove('active'));
+                // Adicionar classe active ao link clicado
+                this.classList.add('active');
+                // Renderizar gráficos da categoria selecionada
+                renderGraficos(this.dataset.category);
+            });
+        });
+
+        // Adicionar animações ao carregar
         document.addEventListener('DOMContentLoaded', function() {
             const cards = document.querySelectorAll('.feature-card');
             cards.forEach((card, index) => {
